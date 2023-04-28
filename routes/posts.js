@@ -3,6 +3,7 @@ var router = express.Router();
 
 const post_controller = require("../controllers/postController");
 const comment_controller = require("../controllers/commentController");
+const like_conroller = require("../controllers/likeController");
 
 /* GET comment details. */
 router.get("/:postId/comments/:commentId", comment_controller.comment_details);
@@ -29,7 +30,7 @@ router.get(
 router.post("/:postId/comments", comment_controller.comment_create);
 
 /* POST post likes. */
-router.post("/:postId/likes", post_controller.post_like_create);
+router.post("/:postId/likes", like_conroller.like_create);
 
 /* POST posts. */
 router.post("/", post_controller.post_create);
@@ -50,7 +51,7 @@ router.delete(
 router.delete("/:postId/comments", comment_controller.comment_delete);
 
 /* DELETE post likes. */
-router.post("/:postId/likes", post_controller.post_like_delete);
+router.post("/:postId/likes", like_conroller.like_delete);
 
 /* DELETE posts. */
 router.delete("/:postId", post_controller.post_delete);

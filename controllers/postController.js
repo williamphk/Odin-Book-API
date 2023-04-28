@@ -78,20 +78,6 @@ exports.post_create = [
   },
 ];
 
-/* POST post like. */
-exports.post_like_create = async (req, res, next) => {
-  const like = new Like({
-    user: req.user._id,
-    post: req.params.postId,
-    createdAt: new Date(),
-  });
-  try {
-    await like.save();
-  } catch (err) {
-    return next(err);
-  }
-};
-
 /* PUT post. */
 exports.post_update = [
   body("content")
@@ -148,20 +134,6 @@ exports.post_delete = async (req, res, next) => {
     return res
       .status(200)
       .json({ message: "Post, related comments and likes deleted" });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/* DELETE post like. */
-exports.post_like_delete = async (req, res, next) => {
-  try {
-    const like = await Like.findById(req.params.postId);
-    if (like == null) {
-      return res.status(401).json({ message: "Like not found" });
-    }
-    await Like.deleteMany({ post: req.params.postId });
-    return res.status(200).json({ message: "Like deleted" });
   } catch (err) {
     next(err);
   }
