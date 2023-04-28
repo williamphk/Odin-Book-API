@@ -24,7 +24,7 @@ router.put("/:userId", user_controller.user_update);
 
 /* DELETE users. */
 router.delete(
-  "/:receiverId/friend-request/:friendRequestId",
+  "/:receiverId/friend-request/",
   friendrequest_controller.friendRequest_delete
 );
 

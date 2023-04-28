@@ -58,7 +58,7 @@ exports.user_listing = async (req, res, next) => {
 exports.user_create = [
   body("firstName")
     .trim()
-    .isLength({ min: 1, max: 50 })
+    .isLength({ min: 1 })
     .withMessage("First name is required")
     .isLength({ max: 50 })
     .withMessage("First name must be less than 50 characters")
@@ -151,7 +151,7 @@ exports.user_create = [
     });
 
     if (!errors.isEmpty()) {
-      return res.status(401).json({ user, profile, errors: errors.array() });
+      return res.status(404).json({ user, profile, errors: errors.array() });
     }
     bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
       user.password = hashedPassword;
@@ -265,7 +265,7 @@ exports.user_update = [
     });
 
     if (!errors.isEmpty()) {
-      res.json({ user, errors: errors.array() });
+      res.status(400).json({ user, errors: errors.array() });
       return next(errors);
     }
     bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
@@ -286,11 +286,11 @@ exports.user_delete = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (user == null) {
-      return res.status(401).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
     const profile = await Profile.findById(req.body.profile);
     if (profile == null) {
-      return res.status(401).json({ message: "Profile not found" });
+      return res.status(404).json({ message: "Profile not found" });
     }
     const friendRequests = await FriendRequest.find({
       $or: [{ sender: req.params.userId }, { receiver: req.params.userId }],

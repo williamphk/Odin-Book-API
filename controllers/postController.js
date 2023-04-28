@@ -55,6 +55,8 @@ exports.post_create = [
     .trim()
     .isLength({ min: 1 })
     .withMessage("Content is required")
+    .isLength({ max: 200 })
+    .withMessage("Content must be less than 200 characters")
     .escape(),
 
   async (req, res, next) => {
@@ -84,6 +86,8 @@ exports.post_update = [
     .trim()
     .isLength({ min: 1 })
     .withMessage("Content is required")
+    .isLength({ max: 200 })
+    .withMessage("Content must be less than 200 characters")
     .escape(),
 
   async (req, res, next) => {
@@ -120,7 +124,7 @@ exports.post_delete = async (req, res, next) => {
       $or: [{ post: postId }, { comment: { $in: commentIds } }],
     });
     if (post == null) {
-      return res.status(401).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Post not found" });
     }
     await Post.deleteOne({ _id: postId });
     if (comments) {

@@ -43,7 +43,7 @@ router.put("/:postId", post_controller.post_update);
 
 /* DELETE comment likes. */
 router.delete(
-  "/:postId/comments/:commentId/likes/:likeId",
+  "/:postId/comments/:commentId/likes",
   comment_controller.comment_like_delete
 );
 
