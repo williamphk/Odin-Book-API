@@ -13,7 +13,7 @@ const ProfileSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   gender: { type: String, enum: ["male", "female", "others"], required: true },
-  birthday: { type: Date },
+  birthday: { type: Date, required: true },
   friends: [
     {
       type: Schema.Types.ObjectId,
@@ -22,11 +22,10 @@ const ProfileSchema = new Schema({
   ],
   avatar: { type: String },
   bio: { type: String },
-  createdAt: { type: Date, default: Date.now },
 });
 
 //Virtual for user's fullname
-UserSchema.virtual("fullname").get(function () {
+ProfileSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 

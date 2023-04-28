@@ -16,6 +16,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+//passport configuration
+const passport = require("passport");
+const jwtStrategry = require("./strategies/jwt");
+passport.use(jwtStrategry);
+
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
