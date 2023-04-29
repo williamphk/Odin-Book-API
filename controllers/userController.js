@@ -1,9 +1,12 @@
 const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
 var bcrypt = require("bcryptjs");
 
 const { User, Profile } = require("../models/user");
 const FriendRequest = require("../models/friendRequest");
+const Post = require("../models/post");
+const Comment = require("../models/comment");
+const Like = require("../models/like");
+
 const {
   nameValidationRules,
   emailValidationRules,
@@ -144,29 +147,57 @@ exports.user_profile_update = [
 /* DELETE user with id. */
 exports.user_delete = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.userId);
-    if (user == null) {
+    // Delete User
+    const userDeleteResult = await User.deleteOne({ _id: req.params.userId });
+    if (userDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "User not found" });
     }
-    const profile = await Profile.findOne({ user: req.params.userId });
-    if (profile == null) {
-      return res.status(404).json({ message: "Profile not found" });
-    }
-    const friendRequests = await FriendRequest.find({
+
+    // Delete User's profile
+    await Profile.deleteOne({ user: req.params.userId });
+
+    // Delete User's friend requests if any
+    await FriendRequest.deleteMany({
       $or: [{ sender: req.params.userId }, { receiver: req.params.userId }],
     });
-    await User.deleteOne({ _id: req.params.userId });
-    await Profile.deleteOne({ user: req.params.userId });
-    if (friendRequests) {
-      FriendRequest.deleteMany({
-        $or: [{ sender: req.params.userId }, { receiver: req.params.userId }],
-      });
-    }
+
     // Update User's friends' friend lists
     await User.updateMany(
       { friends: req.params.userId },
       { $pull: { friends: req.params.userId } }
     );
+
+    //Delete User's posts
+    await Post.deleteMany({ user: req.params.userId });
+
+    //Delete User's likes
+    await Like.deleteMany({ user: req.params.userId });
+
+    //Delete User's comments
+    await Comment.deleteMany({ user: req.params.userId });
+
+    //Delete User's posts' likes
+    const userPosts = await Post.find({ user: req.params.userId });
+    const userPostsIds = userPosts.map((element) => element._id);
+    await Like.deleteMany({ post: { $in: userPostsIds } });
+
+    //Delete User's comments's likes
+    const userComments = await Comment.find({ user: req.params.userId });
+    const userCommentstIds = userComments.map((element) => element._id);
+    await Like.deleteMany({ comment: { $in: userCommentstIds } });
+
+    //Delete User's posts' comments
+    await Comment.deleteMany({ post: { $in: userPostsIds } });
+
+    //Delete User's post's comments's likes
+    const userPostsComments = await Comment.find({
+      post: { $in: userPostsIds },
+    });
+    const userPostsCommentsIds = userPostsComments.map(
+      (element) => element._id
+    );
+    await Like.deleteMany({ comment: { $in: userPostsCommentsIds } });
+
     return res.status(200).json({ message: "User deleted" });
   } catch (err) {
     next(err);

@@ -119,3 +119,22 @@ exports.oldPasswordValidationRules = (key) => [
       return true;
     }),
 ];
+
+exports.friendRequestValidationRules = (key) => [
+  body(key)
+    .trim()
+    .notEmpty()
+    .withMessage("Receiver ID is required")
+    .isMongoId()
+    .withMessage("Invalid receiver ID"),
+];
+
+exports.postContentValidationRules = (key) => [
+  body("content")
+    .trim()
+    .notEmpty()
+    .withMessage("Content is required")
+    .isLength({ max: 200 })
+    .withMessage("Content must be less than 200 characters")
+    .escape(),
+];

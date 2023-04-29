@@ -1,4 +1,5 @@
 const FriendRequest = require("../models/friendRequest");
+const { friendRequestValidationRules } = require("./validationRules");
 
 exports.friendRequest_details = async (req, res, next) => {
   try {
@@ -23,17 +24,8 @@ exports.friendRequest_listing = async (req, res, next) => {
   }
 };
 
-const friendRequestValidationRules = [
-  body("receiverId")
-    .trim()
-    .notEmpty()
-    .withMessage("Receiver ID is required")
-    .isMongoId()
-    .withMessage("Invalid receiver ID"),
-];
-
 exports.friendRequest_create = [
-  ...friendRequestValidationRules,
+  ...friendRequestValidationRules(receiverId),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -105,14 +97,13 @@ exports.friendRequest_update = async (req, res, next) => {
 };
 
 exports.friendRequest_delete = async (req, res, next) => {
-  const friendRequest = await FriendRequest.findById(
-    req.params.friendRequestId
-  );
-  if (friendRequest == null) {
-    return res.status(404).json({ message: "Friend request not found" });
-  }
   try {
-    await FriendRequest.deleteOne({ _id: req.params.friendRequestId });
+    const friendRequestDeleteResult = await FriendRequest.deleteOne({
+      _id: req.params.friendRequestId,
+    });
+    if (friendRequestDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Friend Request not found" });
+    }
     return res.status(200).json({ message: "Friend request cancelled" });
   } catch (err) {
     return next(err);

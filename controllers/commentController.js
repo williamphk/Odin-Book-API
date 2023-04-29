@@ -95,15 +95,12 @@ exports.comment_update = [
 exports.comment_delete = async (req, res, next) => {
   const commentId = req.params.commentId;
   try {
-    const comment = await Comment.findById(commentId);
-    const likes = await Like.find({ comment: commentId });
-    if (comment == null) {
-      return res.status(404).json({ message: "Comment not found" });
+    const commentDeleteResult = await Comment.deleteOne({ _id: commentId });
+    if (commentDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Like not found" });
     }
-    await Comment.deleteOne({ _id: commentId });
-    if (likes) {
-      await Like.deleteMany({ comment: commentId });
-    }
+    await Like.deleteMany({ comment: commentId });
+
     return res
       .status(200)
       .json({ message: "Comment and related likes deleted" });

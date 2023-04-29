@@ -4,6 +4,8 @@ const Post = require("../models/post");
 const User = require("../models/user");
 const Like = require("../models/like");
 
+const { postContentValidationRules } = require("./validationRules");
+
 /* GET user posts listing. */
 exports.post_listing = async (req, res, next) => {
   try {
@@ -51,13 +53,7 @@ exports.post_details = async (req, res, next) => {
 
 /* POST post. */
 exports.post_create = [
-  body("content")
-    .trim()
-    .notEmpty()
-    .withMessage("Content is required")
-    .isLength({ max: 200 })
-    .withMessage("Content must be less than 200 characters")
-    .escape(),
+  ...postContentValidationRules("content"),
 
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -82,13 +78,7 @@ exports.post_create = [
 
 /* PUT post. */
 exports.post_update = [
-  body("content")
-    .trim()
-    .notEmpty()
-    .withMessage("Content is required")
-    .isLength({ max: 200 })
-    .withMessage("Content must be less than 200 characters")
-    .escape(),
+  ...postContentValidationRules("content"),
 
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -116,24 +106,21 @@ exports.post_update = [
 exports.post_delete = async (req, res, next) => {
   const postId = req.params.postId;
   try {
-    const post = await Post.findById(postId);
-    const comments = await Comment.find({ post: postId });
-    const commentIds = comments.map((element) => element._id);
-    const likes = await Like.find({
-      $or: [{ post: postId }, { comment: { $in: commentIds } }],
-    });
-    if (post == null) {
+    const postDeleteResult = await Post.deleteOne({ _id: postId });
+    if (postDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Post not found" });
     }
-    await Post.deleteOne({ _id: postId });
-    if (comments) {
-      await Comment.deleteMany({ post: postId });
-    }
-    if (likes) {
-      await Like.deleteMany({
-        $or: [{ post: postId }, { comment: { $in: commentIds } }],
-      });
-    }
+
+    // Delete Post's comments
+    await Comment.deleteMany({ post: postId });
+
+    // Delete Post's likes and Post's comments' likes
+    const comments = await Comment.find({ post: postId });
+    const commentIds = comments.map((element) => element._id);
+    await Like.deleteMany({
+      $or: [{ post: postId }, { comment: { $in: commentIds } }],
+    });
+
     return res
       .status(200)
       .json({ message: "Post, related comments and likes deleted" });
