@@ -176,34 +176,24 @@ exports.friend_remove = async (req, res, next) => {
 };
 
 /* PUT user profile with id. */
-
 exports.user_profile_update = [
   ...userProfileUpdateValidationRules,
   async (req, res, next) => {
     const errors = validationResult(req);
 
-    const user = new User({
-      email: req.body.email,
-      password: req.body.newPassword,
-      _id: req.params.userId,
-    });
-
-    const profile = new Profile({
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      gender: req.body.gender,
-      birthday: req.user.birthday,
-      _id: req.user.profile,
-    });
-
     if (!errors.isEmpty()) {
-      return res.status(401).json({ user, profile, errors: errors.array() });
+      return res.status(401).json({ errors: errors.array() });
     }
-    bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
-      user.password = hashedPassword;
+    bcrypt.hash(req.body.newPassword, 10, async (err, hashedPassword) => {
       try {
-        await User.updateOne({ _id: req.params.userId }, user);
-        await Profile.updateOne({ _id: req.body.profile }, profile);
+        await User.updateOne(
+          { _id: req.params.userId },
+          { $set: { email: req.body.email, password: hashedPassword } }
+        );
+        await Profile.updateOne(
+          { user: req.params.userId },
+          { $set: { gender: req.body.gender } }
+        );
         return res.status(200).json({ message: "User Updated" });
       } catch (err) {
         return next(err);
@@ -219,7 +209,7 @@ exports.user_delete = async (req, res, next) => {
     if (user == null) {
       return res.status(404).json({ message: "User not found" });
     }
-    const profile = await Profile.findById(req.body.profile);
+    const profile = await Profile.findOne({ user: req.params.userId });
     if (profile == null) {
       return res.status(404).json({ message: "Profile not found" });
     }
@@ -227,13 +217,13 @@ exports.user_delete = async (req, res, next) => {
       $or: [{ sender: req.params.userId }, { receiver: req.params.userId }],
     });
     await User.deleteOne({ _id: req.params.userId });
-    await Profile.deleteOne({ _id: req.body.profile });
+    await Profile.deleteOne({ user: req.params.userId });
     if (friendRequests) {
       FriendRequest.deleteMany({
         $or: [{ sender: req.params.userId }, { receiver: req.params.userId }],
       });
     }
-    // Update User's friend
+    // Update User's friends' friend lists
     await User.updateMany(
       { friends: req.params.userId },
       { $pull: { friends: req.params.userId } }
