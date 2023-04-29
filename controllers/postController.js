@@ -12,7 +12,7 @@ exports.post_listing = async (req, res, next) => {
       .populate("user")
       .sort({ createdAt: -1 }); // Sort by recency (descending order)
 
-    res.json({ posts });
+    res.status(200).json({ posts });
   } catch (err) {
     return next(err);
   }
@@ -33,7 +33,7 @@ exports.post_newsfeed_listing = async (req, res, next) => {
       .populate("user")
       .sort({ createdAt: -1 }); // Sort by recency (descending order)
 
-    res.json({ posts });
+    res.status(200).json({ posts });
   } catch (err) {
     return next(err);
   }
@@ -43,7 +43,7 @@ exports.post_newsfeed_listing = async (req, res, next) => {
 exports.post_details = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId);
-    res.json({ post });
+    res.status(200).json({ post });
   } catch (err) {
     return next(err);
   }
@@ -95,7 +95,6 @@ exports.post_update = [
     const post = new Post({
       user: req.user._id,
       content: req.body.content,
-      createdAt: new Date(),
       _id: req.params.postId,
     });
 

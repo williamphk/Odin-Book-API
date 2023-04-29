@@ -35,7 +35,7 @@ exports.user_details = async (req, res, next) => {
       req.params.userId,
       "email firstName lastName gender birthday friends avatar bio"
     ).populate("profile");
-    res.json({ user });
+    res.status(200).json({ user });
   } catch (err) {
     return next(err);
   }
@@ -49,7 +49,7 @@ exports.user_listing = async (req, res, next) => {
         createdAt: -1,
       })
       .populate("profile");
-    res.json({ users });
+    res.status(200).json({ users });
   } catch (err) {
     return next(err);
   }
