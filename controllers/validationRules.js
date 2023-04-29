@@ -129,7 +129,7 @@ exports.friendRequestValidationRules = (key) => [
     .withMessage("Invalid receiver ID"),
 ];
 
-exports.postContentValidationRules = (key) => [
+exports.contentValidationRules = (key) => [
   body("content")
     .trim()
     .notEmpty()

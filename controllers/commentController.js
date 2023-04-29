@@ -3,6 +3,8 @@ const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
 const Like = require("../models/like");
 
+const { contentValidationRules } = require("./validationRules");
+
 /* GET user comments listing. */
 exports.comment_listing = async (req, res, next) => {
   try {
@@ -28,13 +30,7 @@ exports.comment_details = async (req, res, next) => {
 
 /* POST comment. */
 exports.comment_create = [
-  body("content")
-    .trim()
-    .notEmpty()
-    .withMessage("Content is required")
-    .isLength({ max: 200 })
-    .withMessage("Content must be less than 200 characters")
-    .escape(),
+  ...contentValidationRules("content"),
 
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -60,30 +56,21 @@ exports.comment_create = [
 
 /* PUT comment. */
 exports.comment_update = [
-  body("content")
-    .trim()
-    .notEmpty()
-    .withMessage("Content is required")
-    .isLength({ max: 200 })
-    .withMessage("Content must be less than 200 characters")
-    .escape(),
+  ...contentValidationRules("content"),
 
   async (req, res, next) => {
     const errors = validationResult(req);
-    const comment = new Comment({
-      user: req.user._id,
-      content: req.body.content,
-      post: req.params.postId,
-      _id: req.params.commentId,
-    });
 
     if (!errors.isEmpty()) {
-      res.status(400).json({ comment, errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
       return next(errors);
     }
 
     try {
-      await Comment.updateOne({ _id: req.params.commentId }, comment);
+      await Comment.updateOne(
+        { _id: req.params.commentId },
+        { content: req.body.content }
+      );
       return res.status(200).json({ message: "Comment Updated" });
     } catch (err) {
       return next(err);
@@ -95,10 +82,13 @@ exports.comment_update = [
 exports.comment_delete = async (req, res, next) => {
   const commentId = req.params.commentId;
   try {
+    // Delete Comment
     const commentDeleteResult = await Comment.deleteOne({ _id: commentId });
     if (commentDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Like not found" });
     }
+
+    // Delete Comment's likes
     await Like.deleteMany({ comment: commentId });
 
     return res

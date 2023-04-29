@@ -4,7 +4,7 @@ const Post = require("../models/post");
 const User = require("../models/user");
 const Like = require("../models/like");
 
-const { postContentValidationRules } = require("./validationRules");
+const { contentValidationRules } = require("./validationRules");
 
 /* GET user posts listing. */
 exports.post_listing = async (req, res, next) => {
@@ -53,7 +53,7 @@ exports.post_details = async (req, res, next) => {
 
 /* POST post. */
 exports.post_create = [
-  ...postContentValidationRules("content"),
+  ...contentValidationRules("content"),
 
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -78,23 +78,21 @@ exports.post_create = [
 
 /* PUT post. */
 exports.post_update = [
-  ...postContentValidationRules("content"),
+  ...contentValidationRules("content"),
 
   async (req, res, next) => {
     const errors = validationResult(req);
-    const post = new Post({
-      user: req.user._id,
-      content: req.body.content,
-      _id: req.params.postId,
-    });
 
     if (!errors.isEmpty()) {
-      res.status(400).json({ post, errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
       return next(errors);
     }
 
     try {
-      await Post.updateOne({ _id: req.params.postId }, post);
+      await Post.updateOne(
+        { _id: req.params.postId },
+        { content: req.body.content }
+      );
       return res.status(200).json({ message: "Post Updated" });
     } catch (err) {
       return next(err);
@@ -106,6 +104,7 @@ exports.post_update = [
 exports.post_delete = async (req, res, next) => {
   const postId = req.params.postId;
   try {
+    // Delete Post
     const postDeleteResult = await Post.deleteOne({ _id: postId });
     if (postDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Post not found" });
