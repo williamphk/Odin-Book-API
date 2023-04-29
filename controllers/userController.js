@@ -38,49 +38,6 @@ const userProfileUpdateValidationRules = [
   ...genderValidationRules("gender"),
 ];
 
-/* GET user's friending suggest based on common friends. */
-exports.friend_suggestion = async (req, res, next) => {
-  try {
-    const userId = mongoose.Types.ObjectId(req.params.userId);
-
-    const friendSuggestions = await User.aggregate([
-      { $match: { _id: { $ne: userId }, friends: { $ne: userId } } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "friends",
-          foreignField: "_id",
-          as: "common_friends",
-        },
-      },
-      {
-        $match: {
-          common_friends: {
-            $elemMatch: {
-              friends: userId,
-            },
-          },
-        },
-      },
-      { $project: { password: 0 } },
-    ]);
-
-    return res.status(200).json({ friendSuggestions });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/* GET user's friend listing. */
-exports.friend_listing = async (req, res, next) => {
-  try {
-    const friends = await User.find({ friends: req.params.userId });
-    return res.status(200).json({ friends });
-  } catch (err) {
-    next(err);
-  }
-};
-
 /* GET users details. */
 exports.user_details = async (req, res, next) => {
   try {
@@ -156,24 +113,6 @@ exports.user_create = [
     });
   },
 ];
-
-/* PUT user friend remove. */
-exports.friend_remove = async (req, res, next) => {
-  try {
-    const targetId = mongoose.Types.ObjectId(req.query.targetId);
-    await User.updateOne(
-      { _id: req.params.userId },
-      { $pull: { friends: targetId } }
-    );
-    await User.updateOne(
-      { _id: targetId },
-      { $pull: { friends: req.params.userId } }
-    );
-    return res.status(200).json({ message: "friend removed" });
-  } catch (err) {
-    return next(err);
-  }
-};
 
 /* PUT user profile with id. */
 exports.user_profile_update = [

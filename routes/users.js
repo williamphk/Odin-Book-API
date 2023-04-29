@@ -5,13 +5,14 @@ const passport = require("passport");
 const { isAdmin, isUser } = require("./authMiddleware");
 
 const user_controller = require("../controllers/userController");
+const friend_controller = require("../controllers/friendController");
 
 /* GET user's friending suggest. */
 router.get(
   "/:userId/friends/suggestion",
   passport.authenticate("jwt", { session: false }),
   isUser,
-  user_controller.friend_suggestion
+  friend_controller.friend_suggestion
 );
 
 /* GET user's friend listing. */
@@ -19,7 +20,7 @@ router.get(
   "/:userId/friends",
   passport.authenticate("jwt", { session: false }),
   isUser,
-  user_controller.friend_listing
+  friend_controller.friend_listing
 );
 
 /* GET users details. */
@@ -47,6 +48,14 @@ router.put(
   passport.authenticate("jwt", { session: false }),
   isUser,
   user_controller.user_profile_update
+);
+
+/* DELETE user's friend. */
+router.delete(
+  ":userId/friends/:friendId",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  friend_controller.friend_remove
 );
 
 /* DELETE users. */
