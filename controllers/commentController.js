@@ -30,7 +30,7 @@ exports.comment_details = async (req, res, next) => {
 exports.comment_create = [
   body("content")
     .trim()
-    .isLength({ min: 1 })
+    .notEmpty()
     .withMessage("Content is required")
     .isLength({ max: 200 })
     .withMessage("Content must be less than 200 characters")
@@ -62,7 +62,7 @@ exports.comment_create = [
 exports.comment_update = [
   body("content")
     .trim()
-    .isLength({ min: 1 })
+    .notEmpty()
     .withMessage("Content is required")
     .isLength({ max: 200 })
     .withMessage("Content must be less than 200 characters")

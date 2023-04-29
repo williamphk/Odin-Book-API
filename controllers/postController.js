@@ -53,7 +53,7 @@ exports.post_details = async (req, res, next) => {
 exports.post_create = [
   body("content")
     .trim()
-    .isLength({ min: 1 })
+    .notEmpty()
     .withMessage("Content is required")
     .isLength({ max: 200 })
     .withMessage("Content must be less than 200 characters")
@@ -84,7 +84,7 @@ exports.post_create = [
 exports.post_update = [
   body("content")
     .trim()
-    .isLength({ min: 1 })
+    .notEmpty()
     .withMessage("Content is required")
     .isLength({ max: 200 })
     .withMessage("Content must be less than 200 characters")

@@ -1,22 +1,18 @@
-const { body, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 var bcrypt = require("bcryptjs");
-const { differenceInYears, parseISO } = require("date-fns");
 
 const { User, Profile } = require("../models/user");
 const FriendRequest = require("../models/friendRequest");
-
-// Custom validator for minimum age
-const minAge = (minYears) => {
-  return (value, { req }) => {
-    const birthDate = parseISO(value);
-    const age = differenceInYears(new Date(), birthDate);
-    if (age < minYears) {
-      throw new Error(`Minimum age is ${minYears} years`);
-    }
-    return true;
-  };
-};
+const {
+  nameValidationRules,
+  emailValidationRules,
+  createPasswordValidationRules,
+  confirmPasswordValidationRules,
+  genderValidationRules,
+  birthdayValidationRules,
+  oldPasswordValidationRules,
+} = require("./validationRules");
 
 // Convert names as "title case"
 function toTitleCase(str) {
@@ -25,8 +21,22 @@ function toTitleCase(str) {
   });
 }
 
-// Options for gender
-const allowedGenders = ["male", "female", "others"];
+const userCreateValidationRules = [
+  ...nameValidationRules("firstName", "First name"),
+  ...nameValidationRules("lastName", "Last name"),
+  ...emailValidationRules("email"),
+  ...createPasswordValidationRules("password"),
+  ...confirmPasswordValidationRules("confirmPassword"),
+  ...genderValidationRules("gender"),
+  ...birthdayValidationRules("birthday"),
+];
+const userProfileUpdateValidationRules = [
+  ...emailValidationRules("email"),
+  ...oldPasswordValidationRules("oldPassword"),
+  ...createPasswordValidationRules("newPassword"),
+  ...confirmPasswordValidationRules("confirmNewPassword"),
+  ...genderValidationRules("gender"),
+];
 
 /* GET user's friending suggest based on common friends. */
 exports.friend_suggestion = async (req, res, next) => {
@@ -103,85 +113,7 @@ exports.user_listing = async (req, res, next) => {
 
 /* POST user. */
 exports.user_create = [
-  body("firstName")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("First name is required")
-    .isLength({ max: 50 })
-    .withMessage("First name must be less than 50 characters")
-    .isAlpha()
-    .withMessage("First name must contain only alphabetic characters")
-    .escape(),
-  body("lastName")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Last name is required")
-    .isLength({ max: 50 })
-    .withMessage("Last name must be less than 50 characters")
-    .isAlpha()
-    .withMessage("Last name must contain only alphabetic characters")
-    .escape(),
-  body("email")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Email is required")
-    .isLength({ max: 254 })
-    .withMessage("Email must be less than 254 characters")
-    .normalizeEmail()
-    .toLowerCase()
-    .custom(async (email) => {
-      const user = await User.findOne({ email: email });
-      if (user) {
-        // If a user with the provided email exists, throw an error
-        throw new Error("Email already exists");
-      }
-      return true;
-    })
-    .escape(),
-  body("password")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Password is required")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters")
-    .isLength({ max: 128 })
-    .withMessage("Password must be less than 128 characters")
-    .matches(/[a-z]/, "g")
-    .withMessage("Password must contain at least one lowercase letter")
-    .matches(/[A-Z]/, "g")
-    .withMessage("Password must contain at least one uppercase letter")
-    .matches(/[0-9]/, "g")
-    .withMessage("Password must contain at least one digit")
-    .matches(/[\W_]/, "g")
-    .withMessage("Password must contain at least one special character"),
-  body("confirmPassword")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Confirm password is required")
-    .isLength({ max: 128 })
-    .withMessage("Confirm password must be less than 128 characters")
-    .custom((confirmPassword, { req }) => {
-      if (confirmPassword !== req.body.password) {
-        // If the password do not match, throw an error
-        throw new Error("Passwords do not match");
-      }
-      return true;
-    }),
-  body("gender").custom((value) => {
-    if (!allowedGenders.includes(value)) {
-      throw new Error("Invalid gender value");
-    }
-    return true;
-  }),
-  body("birthday")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Birthday is required")
-    .isISO8601()
-    .withMessage("Invalid date format, expected YYYY-MM-DD")
-    .custom(minAge(13))
-    .escape(),
-
+  ...userCreateValidationRules,
   async (req, res, next) => {
     const errors = validationResult(req);
 
@@ -244,74 +176,9 @@ exports.friend_remove = async (req, res, next) => {
 };
 
 /* PUT user profile with id. */
-exports.user_profile_update = [
-  body("email")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Email is required")
-    .isLength({ max: 254 })
-    .withMessage("Email must be less than 254 characters")
-    .normalizeEmail()
-    .toLowerCase()
-    .custom(async (email) => {
-      const user = await User.findOne({ email: email });
-      if (user) {
-        // If a user with the provided email exists, throw an error
-        throw new Error("Email already exists");
-      }
-      return true;
-    })
-    .escape(),
-  body("oldPassword")
-    .isLength({ min: 1 })
-    .withMessage("Old password is required")
-    .isLength({ max: 128 })
-    .withMessage("Password must be less than 128 characters")
-    .custom(async (oldPassword, { req }) => {
-      const user = await User.findById(req.user._id);
-      // Compare the old password with the stored password
-      const isMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!isMatch) {
-        throw new Error("Invalid old password");
-      }
-      return true;
-    }),
-  body("newPassword")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Password is required")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters")
-    .isLength({ max: 128 })
-    .withMessage("Password must be less than 128 characters")
-    .matches(/[a-z]/, "g")
-    .withMessage("Password must contain at least one lowercase letter")
-    .matches(/[A-Z]/, "g")
-    .withMessage("Password must contain at least one uppercase letter")
-    .matches(/[0-9]/, "g")
-    .withMessage("Password must contain at least one digit")
-    .matches(/[\W_]/, "g")
-    .withMessage("Password must contain at least one special character"),
-  body("confirmNewPassword")
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Confirm password is required")
-    .isLength({ max: 128 })
-    .withMessage("Confirm password must be less than 128 characters")
-    .custom((confirmPassword, { req }) => {
-      if (confirmPassword !== req.body.password) {
-        // If the password do not match, throw an error
-        throw new Error("Passwords do not match");
-      }
-      return true;
-    }),
-  body("gender").custom((value) => {
-    if (!allowedGenders.includes(value)) {
-      throw new Error("Invalid gender value");
-    }
-    return true;
-  }),
 
+exports.user_profile_update = [
+  ...userProfileUpdateValidationRules,
   async (req, res, next) => {
     const errors = validationResult(req);
 
