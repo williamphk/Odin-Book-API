@@ -55,7 +55,7 @@ exports.friend_suggestion = async (req, res, next) => {
       { $project: { password: 0 } },
     ]);
 
-    res.status(200).json({ friendSuggestions });
+    return res.status(200).json({ friendSuggestions });
   } catch (err) {
     next(err);
   }
@@ -65,7 +65,7 @@ exports.friend_suggestion = async (req, res, next) => {
 exports.friend_listing = async (req, res, next) => {
   try {
     const friends = await User.find({ friends: req.params.userId });
-    res.status(200).json({ friends });
+    return res.status(200).json({ friends });
   } catch (err) {
     next(err);
   }
@@ -78,7 +78,10 @@ exports.user_details = async (req, res, next) => {
       req.params.userId,
       "email firstName lastName gender birthday friends avatar bio"
     ).populate("profile");
-    res.status(200).json({ user });
+    if (user == null) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user });
   } catch (err) {
     return next(err);
   }
@@ -92,12 +95,13 @@ exports.user_listing = async (req, res, next) => {
         createdAt: -1,
       })
       .populate("profile");
-    res.status(200).json({ users });
+    return res.status(200).json({ users });
   } catch (err) {
     return next(err);
   }
 };
 
+/* POST user. */
 exports.user_create = [
   body("firstName")
     .trim()
@@ -194,7 +198,7 @@ exports.user_create = [
     });
 
     if (!errors.isEmpty()) {
-      return res.status(404).json({ user, profile, errors: errors.array() });
+      return res.status(401).json({ user, profile, errors: errors.array() });
     }
     bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
       user.password = hashedPassword;
@@ -213,7 +217,7 @@ exports.user_create = [
           { _id: profile._id },
           { $set: { user: user._id } }
         );
-        res.status(200).json({ message: "User created" });
+        return res.status(200).json({ message: "User created" });
       } catch (err) {
         return next(err);
       }
@@ -221,7 +225,25 @@ exports.user_create = [
   },
 ];
 
-/* PUT user with id. */
+/* PUT user friend remove. */
+exports.friend_remove = async (req, res, next) => {
+  try {
+    const targetId = mongoose.Types.ObjectId(req.query.targetId);
+    await User.updateOne(
+      { _id: req.params.userId },
+      { $pull: { friends: targetId } }
+    );
+    await User.updateOne(
+      { _id: targetId },
+      { $pull: { friends: req.params.userId } }
+    );
+    return res.status(200).json({ message: "friend removed" });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/* PUT user profile with id. */
 exports.user_profile_update = [
   body("email")
     .trim()
@@ -308,8 +330,7 @@ exports.user_profile_update = [
     });
 
     if (!errors.isEmpty()) {
-      res.status(400).json({ user, errors: errors.array() });
-      return next(errors);
+      return res.status(401).json({ user, profile, errors: errors.array() });
     }
     bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
       user.password = hashedPassword;
@@ -345,6 +366,11 @@ exports.user_delete = async (req, res, next) => {
         $or: [{ sender: req.params.userId }, { receiver: req.params.userId }],
       });
     }
+    // Update User's friend
+    await User.updateMany(
+      { friends: req.params.userId },
+      { $pull: { friends: req.params.userId } }
+    );
     return res.status(200).json({ message: "User deleted" });
   } catch (err) {
     next(err);

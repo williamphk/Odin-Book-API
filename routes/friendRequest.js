@@ -6,12 +6,12 @@ const { isUserFriendRequest } = require("./authMiddleware");
 
 const friendrequest_controller = require("../controllers/friendRequestController");
 
-/* GET user's friend request. */
+/* GET user's friend request details. */
 router.get(
   "/:friendRequestId",
   passport.authenticate("jwt", { session: false }),
   isUserFriendRequest,
-  friendrequest_controller.friendRequest_accept
+  friendrequest_controller.friendRequest_details
 );
 
 /* GET user's friend request listing. */
