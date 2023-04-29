@@ -4,6 +4,7 @@ exports.friendRequest_create = async (req, res, next) => {
   const friendRequest = new FriendRequest({
     sender: req.user._id,
     receiver: req.params.receiverId,
+    status: "pending",
     createAt: new Date(),
   });
   try {
@@ -13,6 +14,8 @@ exports.friendRequest_create = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.friendRequest_accept = async (req, res, next) => {};
 
 exports.friendRequest_delete = async (req, res, next) => {
   const friendRequest = await FriendRequest.findOne({

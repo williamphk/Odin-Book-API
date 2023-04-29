@@ -28,7 +28,50 @@ function toTitleCase(str) {
 // Options for gender
 const allowedGenders = ["male", "female", "others"];
 
-/* GET user with id. */
+/* GET user's friending suggest based on common friends. */
+exports.friend_suggestion = async (req, res, next) => {
+  try {
+    const userId = mongoose.Types.ObjectId(req.params.userId);
+
+    const friendSuggestions = await User.aggregate([
+      { $match: { _id: { $ne: userId }, friends: { $ne: userId } } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "friends",
+          foreignField: "_id",
+          as: "common_friends",
+        },
+      },
+      {
+        $match: {
+          common_friends: {
+            $elemMatch: {
+              friends: userId,
+            },
+          },
+        },
+      },
+      { $project: { password: 0 } },
+    ]);
+
+    res.status(200).json({ friendSuggestions });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* GET user's friend listing. */
+exports.friend_listing = async (req, res, next) => {
+  try {
+    const friends = await User.find({ friends: req.params.userId });
+    res.status(200).json({ friends });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* GET users details. */
 exports.user_details = async (req, res, next) => {
   try {
     const user = await User.findById(
@@ -41,7 +84,7 @@ exports.user_details = async (req, res, next) => {
   }
 };
 
-/* GET users listing. */
+/* GET all users listing. */
 exports.user_listing = async (req, res, next) => {
   try {
     const users = await User.find({}, "fullName")
@@ -179,7 +222,7 @@ exports.user_create = [
 ];
 
 /* PUT user with id. */
-exports.user_update = [
+exports.user_profile_update = [
   body("email")
     .trim()
     .isLength({ min: 1 })
@@ -260,7 +303,7 @@ exports.user_update = [
       firstName: req.user.firstName,
       lastName: req.user.lastName,
       gender: req.body.gender,
-      birthday: req.body.birthday,
+      birthday: req.user.birthday,
       _id: req.user.profile,
     });
 

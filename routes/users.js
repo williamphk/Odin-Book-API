@@ -1,34 +1,60 @@
 var express = require("express");
 var router = express.Router();
+const passport = require("passport");
+
+const { isAdmin, isUser } = require("./authMiddleware");
 
 const user_controller = require("../controllers/userController");
-const friendrequest_controller = require("../controllers/friendRequestController");
+
+/* GET user's friending suggest. */
+router.get(
+  "/:userId/friends/suggestion",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.friend_suggestion
+);
+
+/* GET user's friend listing. */
+router.get(
+  "/:userId/friends",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.friend_listing
+);
 
 /* GET users details. */
-router.get("/:userId", user_controller.user_details);
+router.get(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_details
+);
 
-/* GET users listing. */
-router.get("/", user_controller.user_listing);
-
-/* POST users. */
-router.post(
-  "/:receiverId/friend-request",
-  friendrequest_controller.friendRequest_create
+/* GET all users listing. */
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  isAdmin,
+  user_controller.user_listing
 );
 
 /* POST users. */
 router.post("/", user_controller.user_create);
 
-/* PUT users. */
-router.put("/:userId", user_controller.user_update);
-
-/* DELETE users. */
-router.delete(
-  "/:receiverId/friend-request",
-  friendrequest_controller.friendRequest_delete
+/* PUT user's profile. */
+router.put(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_profile_update
 );
 
 /* DELETE users. */
-router.delete("/:userId", user_controller.user_delete);
+router.delete(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_delete
+);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const passport = require("passport");
 
 const post_controller = require("../controllers/postController");
 const comment_controller = require("../controllers/commentController");
@@ -21,10 +22,7 @@ router.get("/newsfeed", post_controller.post_newsfeed_listing);
 router.get("/", post_controller.post_listing);
 
 /* POST comment likes. */
-router.get(
-  "/:postId/comments/:commentId/likes",
-  comment_controller.comment_like_create
-);
+router.get("/:postId/comments/:commentId/likes", like_conroller.like_create);
 
 /* POST comments. */
 router.post("/:postId/comments", comment_controller.comment_create);
@@ -42,10 +40,7 @@ router.put("/:postId/comments", comment_controller.comment_update);
 router.put("/:postId", post_controller.post_update);
 
 /* DELETE comment likes. */
-router.delete(
-  "/:postId/comments/:commentId/likes",
-  comment_controller.comment_like_delete
-);
+router.delete("/:postId/comments/:commentId/likes", like_conroller.like_delete);
 
 /* DELETE comments. */
 router.delete("/:postId/comments", comment_controller.comment_delete);
