@@ -46,7 +46,7 @@ exports.comment_create = [
     });
 
     if (!errors.isEmpty()) {
-      return res.status(401).json({ comment, errors: errors.array() });
+      return res.status(400).json({ comment, errors: errors.array() });
     }
 
     try {
@@ -78,7 +78,7 @@ exports.comment_update = [
     });
 
     if (!errors.isEmpty()) {
-      res.json({ comment, errors: errors.array() });
+      res.status(400).json({ comment, errors: errors.array() });
       return next(errors);
     }
 

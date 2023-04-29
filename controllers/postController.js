@@ -68,7 +68,7 @@ exports.post_create = [
     });
 
     if (!errors.isEmpty()) {
-      return res.status(401).json({ post, errors: errors.array() });
+      return res.status(400).json({ post, errors: errors.array() });
     }
 
     try {
@@ -99,7 +99,7 @@ exports.post_update = [
     });
 
     if (!errors.isEmpty()) {
-      res.json({ post, errors: errors.array() });
+      res.status(400).json({ post, errors: errors.array() });
       return next(errors);
     }
 
