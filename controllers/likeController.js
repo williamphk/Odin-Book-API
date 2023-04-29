@@ -8,8 +8,7 @@ exports.like_create = async (req, res, next) => {
   });
   if (req.params.postId && !req.params.commentId) {
     like.post = req.params.postId;
-  }
-  if (req.params.commentId && !req.params.postId) {
+  } else if (req.params.commentId) {
     like.post = req.params.commentId;
   }
   try {
@@ -34,8 +33,7 @@ exports.like_delete = async (req, res, next) => {
         $and: [{ post: req.params.postId }, { user: req.user._id }],
       });
       return res.status(200).json({ message: "Like deleted" });
-    }
-    if (req.params.commentId && !req.params.postId) {
+    } else if (req.params.commentId) {
       const like = await Like.findOne({
         $and: [{ comment: req.params.commentId }, { user: req.user._id }],
       });

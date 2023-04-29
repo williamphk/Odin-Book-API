@@ -47,7 +47,7 @@ exports.friendRequest_update = async (req, res, next) => {
     const receiverId = friendRequest.receiver;
 
     await FriendRequest.updateOne(
-      { _id: req.params.friendRequestId },
+      { _id: req.params.friendRequestId, receiver: req.user._id },
       { $set: { status: "accepted" } }
     );
 

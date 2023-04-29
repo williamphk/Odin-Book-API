@@ -1,10 +1,10 @@
+const { body, validationResult } = require("express-validator");
+const mongoose = require("mongoose");
+var bcrypt = require("bcryptjs");
+const { differenceInYears, parseISO } = require("date-fns");
+
 const { User, Profile } = require("../models/user");
 const FriendRequest = require("../models/friendRequest");
-
-const { body, validationResult } = require("express-validator");
-var bcrypt = require("bcryptjs");
-
-const { differenceInYears, parseISO } = require("date-fns");
 
 // Custom validator for minimum age
 const minAge = (minYears) => {

@@ -2,7 +2,10 @@ var express = require("express");
 var router = express.Router();
 const passport = require("passport");
 
-const { isUserFriendRequest } = require("./authMiddleware");
+const {
+  isUserFriendRequestReceiver,
+  isUserFriendRequestSender,
+} = require("./authMiddleware");
 
 const friendrequest_controller = require("../controllers/friendRequestController");
 
@@ -10,7 +13,7 @@ const friendrequest_controller = require("../controllers/friendRequestController
 router.get(
   "/:friendRequestId",
   passport.authenticate("jwt", { session: false }),
-  isUserFriendRequest,
+  isUserFriendRequestReceiver,
   friendrequest_controller.friendRequest_details
 );
 
@@ -18,7 +21,6 @@ router.get(
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
-  isUserFriendRequest,
   friendrequest_controller.friendRequest_listing
 );
 
@@ -26,21 +28,20 @@ router.get(
 router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
-  isUserFriendRequest,
   friendrequest_controller.friendRequest_create
 );
 
 /* PUT user accpeting friend request */
 router.put("/:friendRequestId"),
   passport.authenticate("jwt", { session: false }),
-  isUserFriendRequest,
+  isUserFriendRequestReceiver,
   friendrequest_controller.friendRequest_update;
 
 /* DELETE user friend request. */
 router.delete(
   "/:friendRequestId",
   passport.authenticate("jwt", { session: false }),
-  isUserFriendRequest,
+  isUserFriendRequestSender,
   friendrequest_controller.friendRequest_delete
 );
 
