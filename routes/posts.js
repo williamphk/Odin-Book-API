@@ -2,7 +2,12 @@ var express = require("express");
 var router = express.Router();
 const passport = require("passport");
 
-const { isUserPost } = require("./authMiddleware");
+const {
+  isPostUser,
+  isPostUserAndUserFriends,
+  isCommentUser,
+  isLikeUser,
+} = require("./authMiddleware");
 
 const post_controller = require("../controllers/postController");
 const comment_controller = require("../controllers/commentController");
@@ -12,6 +17,7 @@ const like_conroller = require("../controllers/likeController");
 router.get(
   "/:postId/comments/:commentId",
   passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
   comment_controller.comment_details
 );
 
@@ -19,6 +25,7 @@ router.get(
 router.get(
   "/:postId/comments",
   passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
   comment_controller.comment_listing
 );
 
@@ -26,6 +33,7 @@ router.get(
 router.get(
   "/:postId",
   passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
   post_controller.post_details
 );
 
@@ -47,6 +55,7 @@ router.get(
 router.get(
   "/:postId/comments/:commentId/likes",
   passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
   like_conroller.like_create
 );
 
@@ -54,6 +63,7 @@ router.get(
 router.post(
   "/:postId/comments",
   passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
   comment_controller.comment_create
 );
 
@@ -61,6 +71,7 @@ router.post(
 router.post(
   "/:postId/likes",
   passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
   like_conroller.like_create
 );
 
@@ -73,8 +84,9 @@ router.post(
 
 /* PUT comments. */
 router.put(
-  "/:postId/comments",
+  "/:postId/comments/:commentId",
   passport.authenticate("jwt", { session: false }),
+  isCommentUser,
   comment_controller.comment_update
 );
 
@@ -82,27 +94,31 @@ router.put(
 router.put(
   "/:postId",
   passport.authenticate("jwt", { session: false }),
+  isPostUser,
   post_controller.post_update
 );
 
 /* DELETE comment likes. */
 router.delete(
-  "/:postId/comments/:commentId/likes",
+  "/:postId/comments/:commentId/likes/:likeId",
   passport.authenticate("jwt", { session: false }),
+  isLikeUser,
   like_conroller.like_delete
 );
 
 /* DELETE comments. */
 router.delete(
-  "/:postId/comments",
+  "/:postId/comments/:commentId",
   passport.authenticate("jwt", { session: false }),
+  isCommentUser,
   comment_controller.comment_delete
 );
 
 /* DELETE post likes. */
 router.post(
-  "/:postId/likes",
+  "/:postId/likes/:likeId",
   passport.authenticate("jwt", { session: false }),
+  isLikeUser,
   like_conroller.like_delete
 );
 
@@ -110,6 +126,7 @@ router.post(
 router.delete(
   "/:postId",
   passport.authenticate("jwt", { session: false }),
+  isPostUser,
   post_controller.post_delete
 );
 

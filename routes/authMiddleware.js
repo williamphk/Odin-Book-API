@@ -79,16 +79,93 @@ module.exports.isUserFriendRequestReceiver = async (req, res, next) => {
   }
 };
 
-module.exports.isUserPost = async (req, res, next) => {
-  const post = await Post.findById(req.params.id).populate("user");
-  if (
-    post.user._id.toString() ===
-    new mongoose.Types.ObjectId(req.user._id).toString()
-  ) {
-    next();
+module.exports.isPostUser = async (req, res, next) => {
+  const post = await Post.findById(req.params.postId);
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
+
+  const postUser = await User.findById(post.user);
+  if (!postUser) {
+    return res.status(404).json({ message: "Post user not found" });
+  }
+
+  // Check if the user is the post user
+  if (req.user._id.toString() !== postUser._id.toString()) {
+    return res
+      .status(401)
+      .json({ message: "You are not the user of this post" });
   } else {
-    res.status(401).json({
-      msg: "You are not this user",
-    });
+    next();
+  }
+};
+
+module.exports.isPostUserAndUserFriends = async (req, res, next) => {
+  const post = await Post.findById(req.params.postId);
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
+
+  const postUser = await User.findById(post.user);
+  if (!postUser) {
+    return res.status(404).json({ message: "Post user not found" });
+  }
+
+  const postUserFriends = await User.find({ friends: postUser._id });
+  const postUserFriendsIds = postUserFriends.map((element) =>
+    element._id.toString()
+  );
+  // Check if the user is the post user or post user's friend
+  if (
+    req.user._id.toString() !== postUser._id.toString() &&
+    !postUserFriendsIds.includes(req.user._id.toString())
+  ) {
+    return res
+      .status(401)
+      .json({ message: "You are not the authorised to this post" });
+  } else {
+    next();
+  }
+};
+
+module.exports.isCommentUser = async (req, res, next) => {
+  const comment = await Comment.findById(req.params.commentId);
+  if (!comment) {
+    return res.status(404).json({ message: "Comment not found" });
+  }
+
+  const commentUser = await User.findById(comment.user);
+  if (!commentUser) {
+    return res.status(404).json({ message: "Comment user not found" });
+  }
+
+  // Check if the user is the post user
+  if (req.user._id.toString() !== commentUser._id.toString()) {
+    return res
+      .status(401)
+      .json({ message: "You are not the user of this comment" });
+  } else {
+    next();
+  }
+};
+
+module.exports.isLikeUser = async (req, res, next) => {
+  const like = await Like.findById(req.params.likeId);
+  if (!like) {
+    return res.status(404).json({ message: "Like not found" });
+  }
+
+  const likeUser = await User.findById(like.user);
+  if (!likeUser) {
+    return res.status(404).json({ message: "Like user not found" });
+  }
+
+  // Check if the user is the post user
+  if (req.user._id.toString() !== likeUser._id.toString()) {
+    return res
+      .status(401)
+      .json({ message: "You are not the user of this like" });
+  } else {
+    next();
   }
 };
