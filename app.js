@@ -29,7 +29,7 @@ passport.use(facebookStrategry);
 app.use("/", indexRouter);
 app.use("/login", loginRouter);
 app.use("/users", usersRouter);
-app.use("/friend-request", friendRequestRouter);
-app.use("/post", postRouter);
+app.use("/friend-requests", friendRequestRouter);
+app.use("/posts", postRouter);
 
 module.exports = app;
