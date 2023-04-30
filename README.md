@@ -76,7 +76,11 @@ MongoDB: Install [MongoDB](https://www.mongodb.com/try/download/community) local
 
         MONGO_SECRET_KEY=<your_mongodb_secret_key>
     
-        SECRET=<your_jwt_secret>
+        JWT_SECRET=<your_jwt_secret>
+        
+        FB_APP_ID=<your facebook app id>
+        
+        FB_APP_SECRET=<your facebook app secret>
 
 5. Run the development server:
 
