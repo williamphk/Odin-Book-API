@@ -32,10 +32,16 @@ router.post(
 );
 
 /* PUT user accpeting friend request */
-router.put("/:friendRequestId"),
+router.put("/:friendRequestId/accept"),
   passport.authenticate("jwt", { session: false }),
   isUserFriendRequestReceiver,
-  friendrequest_controller.friendRequest_update;
+  friendrequest_controller.friendRequest_accept;
+
+/* PUT user rejecting friend request */
+router.put("/:friendRequestId/reject"),
+  passport.authenticate("jwt", { session: false }),
+  isUserFriendRequestReceiver,
+  friendrequest_controller.friendRequest_reject;
 
 /* DELETE user friend request. */
 router.delete(

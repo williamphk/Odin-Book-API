@@ -1,6 +1,7 @@
 const FriendRequest = require("../models/friendRequest");
 const { friendRequestValidationRules } = require("./validationRules");
 
+/* GET user's friend request details. */
 exports.friendRequest_details = async (req, res, next) => {
   try {
     const friendRequest = await FriendRequest.findById(
@@ -15,6 +16,7 @@ exports.friendRequest_details = async (req, res, next) => {
   }
 };
 
+/* GET user's friend request listing. */
 exports.friendRequest_listing = async (req, res, next) => {
   try {
     const friendRequests = FriendRequest.find({ receiver: req.user._id });
@@ -24,6 +26,7 @@ exports.friendRequest_listing = async (req, res, next) => {
   }
 };
 
+/* POST user friend request. */
 exports.friendRequest_create = [
   ...friendRequestValidationRules(receiverId),
   async (req, res, next) => {
@@ -71,7 +74,8 @@ exports.friendRequest_create = [
   },
 ];
 
-exports.friendRequest_update = async (req, res, next) => {
+/* PUT user accpeting friend request */
+exports.friendRequest_accept = async (req, res, next) => {
   try {
     const friendRequest = await FriendRequest.findOne({
       _id: req.params.friendRequestId,
@@ -96,6 +100,24 @@ exports.friendRequest_update = async (req, res, next) => {
   }
 };
 
+/* PUT user rejecting friend request */
+exports.friendRequest_reject = async (req, res, next) => {
+  try {
+    const friendRequestUpdateResult = await FriendRequest.updateOne(
+      { _id: req.params.friendRequestId, receiver: req.user._id },
+      { $set: { status: "rejected" } }
+    );
+    if (friendRequestUpdateResult.modifiedCount == 0) {
+      return res.status(404).json({ message: "Friend request not found" });
+    }
+
+    return res.status(200).json({ message: "Friend request rejected" });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/* DELETE user friend request. */
 exports.friendRequest_delete = async (req, res, next) => {
   try {
     const friendRequestDeleteResult = await FriendRequest.deleteOne({
