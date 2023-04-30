@@ -101,3 +101,6 @@ Please feel free to submit issues or pull requests for any bugs or improvements.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+- [The Odin Project](https://www.theodinproject.com/)
