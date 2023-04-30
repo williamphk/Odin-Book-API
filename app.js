@@ -4,7 +4,10 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
 var indexRouter = require("./routes/index");
+var loginRouter = require("./routes/login");
 var usersRouter = require("./routes/users");
+var friendRequestRouter = require("./routes/friendRequest");
+var postRouter = require("./routes/posts");
 
 require("./mongoConfig");
 
@@ -19,9 +22,14 @@ app.use(express.static(path.join(__dirname, "public")));
 //passport configuration
 const passport = require("passport");
 const jwtStrategry = require("./strategies/jwt");
+const facebookStrategry = require("./strategies/facebook");
 passport.use(jwtStrategry);
+passport.use(facebookStrategry);
 
 app.use("/", indexRouter);
+app.use("/login", loginRouter);
 app.use("/users", usersRouter);
+app.use("./friend-request", friendRequestRouter);
+app.use("./post", postRouter);
 
 module.exports = app;

@@ -2,11 +2,30 @@ var express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 var bcrypt = require("bcryptjs");
+const passport = require("passport");
 require("dotenv").config();
 
 var router = express.Router();
 
-/* POST login */
+router.get(
+  "/facebook/callback",
+  passport.authenticate("facebook", { failureRedirect: "/login" }),
+  function (req, res) {
+    // Generate a JWT for the authenticated user
+    const token = jwt.sign({ id: req.user.id }, `${process.env.SECRET}`, {
+      expiresIn: "14d",
+    });
+
+    res.json({ token });
+  }
+);
+
+router.get(
+  "/facebook",
+  passport.authenticate("facebook", { scope: ["email"] })
+);
+
+/* POST JWT login */
 router.post("/", async (req, res, next) => {
   const { email, password } = req.body;
   try {

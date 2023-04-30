@@ -28,7 +28,7 @@ exports.friendRequest_listing = async (req, res, next) => {
 
 /* POST user friend request. */
 exports.friendRequest_create = [
-  ...friendRequestValidationRules(receiverId),
+  ...friendRequestValidationRules("receiverId"),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

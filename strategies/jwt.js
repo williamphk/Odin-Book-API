@@ -6,7 +6,7 @@ require("dotenv").config();
 const User = require("../models/user");
 
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = `${process.env.SECRET}`; //normally store this in process.env.secret
+opts.secretOrKey = `${process.env.JWT_SECRET}`; //normally store this in process.env.secret
 
 module.exports = new JwtStrategy(opts, async (jwt_payload, done) => {
   try {

@@ -130,7 +130,7 @@ exports.friendRequestValidationRules = (key) => [
 ];
 
 exports.contentValidationRules = (key) => [
-  body("content")
+  body(key)
     .trim()
     .notEmpty()
     .withMessage("Content is required")

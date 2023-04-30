@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String },
+  facebookId: { type: String, unique: true, sparse: true },
   profile: { type: Schema.Types.ObjectId, ref: "Profile" },
   createdAt: { type: Date, default: Date.now },
 });
@@ -12,16 +13,15 @@ const ProfileSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User" },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  gender: { type: String, enum: ["male", "female", "others"], required: true },
-  birthday: { type: Date, required: true },
+  gender: { type: String },
+  birthday: { type: Date },
   friends: [
     {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
   ],
-  avatar: { type: String },
-  bio: { type: String },
+  picture: { type: String },
 });
 
 //Virtual for user's fullname
