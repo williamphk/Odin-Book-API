@@ -2,6 +2,53 @@
 
 This is a RESTful API for a social network application built with Node.js, Express, and MongoDB. This API allows users to create and manage users, profiles, friend requests, posts, comments, and likes.
 
+## API Endpoints
+
+The API consists of the following endpoints:
+
+### Users
+- Register: `/users` (POST)
+- Login with JWT: `/login` (POST)
+- Login with Facebook: `/login/facebook` (GET)
+- Get user details: `/users/:userId` (GET)
+- Get user list: `/users` (GET)
+- Update user: `/users/:userId` (PUT)
+- Delete user: `/users/:userId` (DELETE)
+
+### Friends
+- Get user's friend list: `/users/:userId/friend` (GET)
+- Get user's friend suggestion: `/users/:userId/friend/suggestion` (GET)
+- Delete user's friend: `/users/:userId/friends/:friendId` (DELETE)
+
+### Friend Requests
+- Get friend request details: `/friend-requests/:friendRequestId` (GET)
+- Get user's friend request list: `/friend-requests` (GET)
+- Send friend request: `/friend-requests` (POST)
+- Accept friend request: `/friend-requests/:friendRequestId/accept` (PUT)
+- Reject friend request: `/friend-requests/:friendRequestId/reject` (PUT)
+- Cancel friend request: `/friend-requests/:friendRequestId/` (DELETE)
+
+### Posts
+- Create post: `/posts` (POST)
+- Get user's post list: `/posts` (GET)
+- Get user's newsfeed : `/posts/newsfeed` (GET)
+- Get post detail: `/posts/:postId` (GET)
+- Update post: `/posts/:postId` (PUT)
+- Delete post: `/posts/:postId` (DELETE)
+
+### Comments
+- Create comment: `/posts/:postId/comment` (POST)
+- Get comment: `/posts/:postId/comment/:commentId` (GET)
+- Get post's comment list: `/posts/:postId/comments` (GET)
+- Update comment: `/posts/:postId/comment/:commentId` (PUT)
+- Delete comment: `/posts/:postId/comment/:commentId` (DELETE)
+
+### Likes
+- Add like to post: `/posts/:postId/like` (POST)
+- Remove like from post: `/posts/:postId/like/:likeId` (DELETE)
+- Add like to comment: `/posts/:postId/comment/:commentId/like` (POST)
+- Remove like from comment: `/posts/:postId/comment/:commentId/like/:likeId` (DELETE)
+
 ## Getting Started
 These instructions will help you set up and run the project on your local machine for development and testing purposes.
 
@@ -36,19 +83,6 @@ MongoDB: Install [MongoDB](https://www.mongodb.com/try/download/community) local
         npm run dev
 
 The server will run on the specified port, and you can access the API endpoints via a REST client like [Postman](https://www.postman.com/).
-
-## API Endpoints
-
-The API consists of the following endpoints:
-
-- Users: Create, update, delete users, and authenticate users.
-- Profiles: Create, update, delete, and get user profiles.
-- Friend Requests: Send, accept, reject, and cancel friend requests.
-- Posts: Create, update, delete, and get user posts.
-- Comments: Create, update, delete, and get post comments.
-- Likes: Add and remove likes on posts and comments.
-
-Refer to the routes folder for more information about the specific endpoints, HTTP methods, and required parameters.
 
 ## Built With
 
