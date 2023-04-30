@@ -37,17 +37,17 @@ The API consists of the following endpoints:
 - Delete post: `/posts/:postId` (DELETE)
 
 ### Comments
-- Create comment: `/posts/:postId/comment` (POST)
-- Get comment: `/posts/:postId/comment/:commentId` (GET)
+- Create comment: `/posts/:postId/comments` (POST)
+- Get comment: `/posts/:postId/comments/:commentId` (GET)
 - Get post's comment list: `/posts/:postId/comments` (GET)
-- Update comment: `/posts/:postId/comment/:commentId` (PUT)
-- Delete comment: `/posts/:postId/comment/:commentId` (DELETE)
+- Update comment: `/posts/:postId/comments/:commentId` (PUT)
+- Delete comment: `/posts/:postId/comments/:commentId` (DELETE)
 
 ### Likes
-- Add like to post: `/posts/:postId/like` (POST)
-- Remove like from post: `/posts/:postId/like/:likeId` (DELETE)
-- Add like to comment: `/posts/:postId/comment/:commentId/like` (POST)
-- Remove like from comment: `/posts/:postId/comment/:commentId/like/:likeId` (DELETE)
+- Add like to post: `/posts/:postId/likes` (POST)
+- Remove like from post: `/posts/:postId/likes/:likeId` (DELETE)
+- Add like to comment: `/posts/:postId/comments/:commentId/likes` (POST)
+- Remove like from comment: `/posts/:postId/comments/:commentId/likes/:likeId` (DELETE)
 
 ## Getting Started
 These instructions will help you set up and run the project on your local machine for development and testing purposes.
