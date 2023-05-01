@@ -1,6 +1,5 @@
-const { body, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
 
-const User = require("../models/user");
 const Like = require("../models/like");
 
 const { contentValidationRules } = require("./validationRules");
