@@ -19,12 +19,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-//passport configuration
+// Passport configuration
 const passport = require("passport");
 const jwtStrategry = require("./strategies/jwt");
 const facebookStrategry = require("./strategies/facebook");
 passport.use(jwtStrategry);
 passport.use(facebookStrategry);
+
+// Enable CORS
+app.use(cors());
 
 app.use("/", indexRouter);
 app.use("/login", loginRouter);
