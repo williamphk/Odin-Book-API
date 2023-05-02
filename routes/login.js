@@ -7,17 +7,12 @@ require("dotenv").config();
 
 var router = express.Router();
 
+const login_controller = require("../controllers/loginController");
+
 router.get(
   "/facebook/callback",
   passport.authenticate("facebook", { failureRedirect: "/login" }),
-  function (req, res) {
-    // Generate a JWT for the authenticated user
-    const token = jwt.sign({ id: req.user.id }, `${process.env.SECRET}`, {
-      expiresIn: "14d",
-    });
-
-    res.json({ token });
-  }
+  login_controller.facebook_login
 );
 
 router.get(
@@ -26,46 +21,6 @@ router.get(
 );
 
 /* POST JWT login */
-router.post("/", async (req, res, next) => {
-  const { email, password } = req.body;
-  try {
-    // Find the user with the provided username
-    const user = await User.findOne({ email });
-    // If the user is not found, return with a message
-    if (!user) {
-      return res.status(401).json({ message: "Incorrect email" });
-    }
-
-    // Compare the provided password with the stored hashed password
-    bcrypt.compare(password, user.password, (err, result) => {
-      if (err) {
-        return next(err);
-      }
-
-      if (result) {
-        // If the passwords match, log the user in
-        const secret = `${process.env.SECRET}`;
-        const token = jwt.sign({ email }, secret, { expiresIn: "14d" });
-        const userResponse = {
-          _id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          fullName: user.fullName,
-        };
-        return res.status(200).json({
-          message: "Login successful",
-          token,
-          userResponse,
-        });
-      } else {
-        // If the passwords do not match, return with a message
-        return res.status(401).json({ message: "Incorrect password" });
-      }
-    });
-  } catch (err) {
-    return next(err);
-  }
-});
+router.post("/", login_controller.jwt_login);
 
 module.exports = router;

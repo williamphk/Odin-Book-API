@@ -1,6 +1,8 @@
 const { body } = require("express-validator");
 const { differenceInYears, parseISO } = require("date-fns");
 
+const { User } = require("../models/user");
+
 // Custom validator for minimum age
 const minAge = (minYears) => {
   return (value, { req }) => {

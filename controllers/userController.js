@@ -90,8 +90,9 @@ exports.user_create = [
     });
 
     if (!errors.isEmpty()) {
-      return res.status(401).json({ user, profile, errors: errors.array() });
+      return res.status(400).json({ user, profile, errors: errors.array() });
     }
+
     bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
       user.password = hashedPassword;
       try {
@@ -109,7 +110,22 @@ exports.user_create = [
           { _id: profile._id },
           { $set: { user: user._id } }
         );
-        return res.status(200).json({ message: "User created" });
+
+        // Log the user in
+        const secret = `${process.env.SECRET}`;
+        const token = jwt.sign({ id: user._id }, secret, { expiresIn: "14d" });
+        const userResponse = {
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          fullName: user.fullName,
+        };
+        return res.status(200).json({
+          message: "User created & login successful",
+          token,
+          userResponse,
+        });
       } catch (err) {
         return next(err);
       }
@@ -124,7 +140,7 @@ exports.user_profile_update = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(401).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
     bcrypt.hash(req.body.newPassword, 10, async (err, hashedPassword) => {
       try {
