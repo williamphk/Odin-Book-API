@@ -25,8 +25,6 @@ exports.nameValidationRules = (key, displayName) => [
     .withMessage(`${displayName} is required`)
     .isLength({ max: 50 })
     .withMessage(`${displayName} must be less than 50 characters`)
-    .isAlpha()
-    .withMessage(`${displayName} must contain only alphabetic characters`)
     .escape(),
 ];
 

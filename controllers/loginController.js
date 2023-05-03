@@ -18,7 +18,7 @@ exports.jwt_login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     // Find the user with the provided username
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("profile");
     // If the user is not found, return with a message
     if (!user) {
       return res.status(401).json({ email: "Incorrect email" });
@@ -32,14 +32,14 @@ exports.jwt_login = async (req, res, next) => {
 
       if (result) {
         // If the passwords match, log the user in
-        const secret = `${process.env.SECRET}`;
+        const secret = `${process.env.JWT_SECRET}`;
         const token = jwt.sign({ email }, secret, { expiresIn: "14d" });
         const userResponse = {
           _id: user._id,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          fullName: user.fullName,
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
+          fullName: user.profile.fullName,
         };
         return res.status(200).json({
           message: "Login successful",
