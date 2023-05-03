@@ -13,6 +13,13 @@ const post_controller = require("../controllers/postController");
 const comment_controller = require("../controllers/commentController");
 const like_conroller = require("../controllers/likeController");
 
+/* GET posts newsfeed listing. */
+router.get(
+  "/newsfeed",
+  passport.authenticate("jwt", { session: false }),
+  post_controller.post_newsfeed_listing
+);
+
 /* GET comment details. */
 router.get(
   "/:postId/comments/:commentId",
@@ -35,13 +42,6 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   isPostUserAndUserFriends,
   post_controller.post_details
-);
-
-/* GET posts newsfeed listing. */
-router.get(
-  "/newsfeed",
-  passport.authenticate("jwt", { session: false }),
-  post_controller.post_newsfeed_listing
 );
 
 /* GET posts listing. */

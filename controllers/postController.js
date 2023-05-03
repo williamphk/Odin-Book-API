@@ -26,8 +26,8 @@ exports.post_newsfeed_listing = async (req, res, next) => {
     const userId = req.user._id;
 
     // Fetch the user and their friends
-    const user = await User.findById(userId);
-    const friendIds = user.friends.map((friend) => friend._id);
+    const user = await User.findById(userId).populate("profile");
+    const friendIds = user.profile.friends.map((friend) => friend._id);
     friendIds.push(userId); // Include user's own post
 
     // Fetch posts from the user and their friends
