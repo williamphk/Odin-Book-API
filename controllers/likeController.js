@@ -1,5 +1,41 @@
 const Like = require("../models/like");
 
+/* Get comment like listing */
+exports.comment_like_listing = async (req, res, next) => {
+  try {
+    const likes = Like.find({ comment: req.params.commentId })
+      .populate({
+        path: "user",
+        populate: {
+          path: "profile",
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({ likes });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/* Get post like listing */
+exports.post_like_listing = async (req, res, next) => {
+  try {
+    const likes = Like.find({ post: req.params.postId })
+      .populate({
+        path: "user",
+        populate: {
+          path: "profile",
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({ likes });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 /* POST like. */
 exports.like_create = async (req, res, next) => {
   const like = new Like({

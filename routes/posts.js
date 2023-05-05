@@ -20,12 +20,12 @@ router.get(
   post_controller.post_newsfeed_listing
 );
 
-/* POST comment likes. */
+/* GET comment like listing. */
 router.get(
   "/:postId/comments/:commentId/likes",
   passport.authenticate("jwt", { session: false }),
   isPostUserAndUserFriends,
-  like_conroller.like_create
+  like_conroller.comment_like_listing
 );
 
 /* GET comment details. */
@@ -44,6 +44,14 @@ router.get(
   comment_controller.comment_listing
 );
 
+/* GET post like listing. */
+router.get(
+  "/:postId/likes",
+  passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
+  like_conroller.post_like_listing
+);
+
 /* GET posts details. */
 router.get(
   "/:postId",
@@ -57,6 +65,14 @@ router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
   post_controller.post_listing
+);
+
+/* POST comment likes. */
+router.post(
+  "/:postId/comments/:commentId/likes",
+  passport.authenticate("jwt", { session: false }),
+  isPostUserAndUserFriends,
+  like_conroller.like_create
 );
 
 /* POST comments. */
