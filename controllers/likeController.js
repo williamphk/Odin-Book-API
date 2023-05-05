@@ -3,7 +3,7 @@ const Like = require("../models/like");
 /* Get comment like listing */
 exports.comment_like_listing = async (req, res, next) => {
   try {
-    const likes = Like.find({ comment: req.params.commentId })
+    const likes = await Like.find({ comment: req.params.commentId })
       .populate({
         path: "user",
         populate: {
@@ -21,7 +21,7 @@ exports.comment_like_listing = async (req, res, next) => {
 /* Get post like listing */
 exports.post_like_listing = async (req, res, next) => {
   try {
-    const likes = Like.find({ post: req.params.postId })
+    const likes = await Like.find({ post: req.params.postId })
       .populate({
         path: "user",
         populate: {
