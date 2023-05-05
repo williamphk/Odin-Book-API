@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 
+const Comment = require("../models/comment");
 const Like = require("../models/like");
 
 const { contentValidationRules } = require("./validationRules");
@@ -9,6 +10,12 @@ exports.comment_listing = async (req, res, next) => {
   try {
     const comments = await Comment.find({ post: req.params.postId })
       .populate("post")
+      .populate({
+        path: "user",
+        populate: {
+          path: "profile",
+        },
+      })
       .sort({ createdAt: -1 }); // Sort by recency (descending order)
 
     res.status(200).json({ comments });

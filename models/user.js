@@ -22,7 +22,7 @@ const ProfileSchema = new Schema(
         ref: "User",
       },
     ],
-    picture: { type: String },
+    picture: { type: String, default: "123" },
   },
   {
     // Include these options to include virtual properties in the output

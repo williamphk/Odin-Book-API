@@ -40,6 +40,7 @@ exports.jwt_login = async (req, res, next) => {
           firstName: user.profile.firstName,
           lastName: user.profile.lastName,
           fullName: user.profile.fullName,
+          picture: user.profile.picture,
         };
         return res.status(200).json({
           message: "Login successful",
