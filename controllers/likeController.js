@@ -38,18 +38,33 @@ exports.post_like_listing = async (req, res, next) => {
 
 /* POST like. */
 exports.like_create = async (req, res, next) => {
+  const { postId, commentId } = req.params;
+  const { _id: userId } = req.user;
+
+  console.log(postId);
+
+  // Check for existing like
+  const existingLike = await Like.findOne({
+    user: userId,
+    // either find by comment or post
+    ...(commentId ? { comment: commentId } : { post: postId }),
+  });
+
+  if (existingLike) {
+    return res.status(400).json({ message: "Like already exists" });
+  }
+
+  // Create a new like
   const like = new Like({
-    user: req.user._id,
+    user: userId,
+    post: postId,
+    comment: commentId,
     createdAt: new Date(),
   });
-  if (req.params.postId && !req.params.commentId) {
-    like.post = req.params.postId;
-  } else if (req.params.commentId) {
-    like.post = req.params.commentId;
-  }
+
   try {
     await like.save();
-    res.status(200).json({ message: "Like created" });
+    return res.status(200).json({ message: "Like created" });
   } catch (err) {
     return next(err);
   }

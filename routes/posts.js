@@ -86,6 +86,19 @@ router.post(
 /* POST post likes. */
 router.post(
   "/:postId/likes",
+  // (req, res, next) => {
+  //   passport.authenticate("jwt", { session: false }, (err, user, info) => {
+  //     if (err) {
+  //       return next(err);
+  //     }
+  //     if (!user) {
+  //       console.log("Info:", info); // Add this line to log the info object
+  //       return res.status(401).json({ message: "Unauthorized" });
+  //     }
+  //     req.user = user;
+  //     next();
+  //   })(req, res, next);
+  // },
   passport.authenticate("jwt", { session: false }),
   isPostUserAndUserFriends,
   like_conroller.like_create
