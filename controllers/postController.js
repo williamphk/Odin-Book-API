@@ -1,6 +1,7 @@
 const { body, validationResult } = require("express-validator");
 
 const Post = require("../models/post");
+const Comment = require("../models/comment");
 const { User } = require("../models/user");
 const Like = require("../models/like");
 
@@ -32,7 +33,12 @@ exports.post_newsfeed_listing = async (req, res, next) => {
 
     // Fetch posts from the user and their friends
     const posts = await Post.find({ user: { $in: friendIds } })
-      .populate("user")
+      .populate({
+        path: "user",
+        populate: {
+          path: "profile",
+        },
+      })
       .sort({ createdAt: -1 }); // Sort by recency (descending order)
 
     res.status(200).json({ posts });

@@ -9,20 +9,27 @@ const UserSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const ProfileSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: "User" },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  gender: { type: String },
-  birthday: { type: Date },
-  friends: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
-  picture: { type: String },
-});
+const ProfileSchema = new Schema(
+  {
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    gender: { type: String },
+    birthday: { type: Date },
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    picture: { type: String },
+  },
+  {
+    // Include these options to include virtual properties in the output
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true },
+  }
+);
 
 //Virtual for user's fullname
 ProfileSchema.virtual("fullName").get(function () {
