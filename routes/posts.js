@@ -144,7 +144,7 @@ router.delete(
 );
 
 /* DELETE post likes. */
-router.post(
+router.delete(
   "/:postId/likes/:likeId",
   passport.authenticate("jwt", { session: false }),
   isLikeUser,

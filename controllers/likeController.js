@@ -57,8 +57,7 @@ exports.like_create = async (req, res, next) => {
   // Create a new like
   const like = new Like({
     user: userId,
-    post: postId,
-    comment: commentId,
+    ...(commentId ? { comment: commentId } : { post: postId }),
     createdAt: new Date(),
   });
 
@@ -73,23 +72,14 @@ exports.like_create = async (req, res, next) => {
 /* DELETE like. */
 exports.like_delete = async (req, res, next) => {
   try {
-    if (req.params.postId && !req.params.commentId) {
-      const likeDeleteResult = await Like.deleteOne({
-        $and: [{ post: req.params.postId }, { user: req.user._id }],
-      });
-      if (likeDeleteResult.deletedCount === 0) {
-        return res.status(404).json({ message: "Like not found" });
-      }
-      return res.status(200).json({ message: "Like deleted" });
-    } else if (req.params.commentId) {
-      const likeDeleteResult = await Like.deleteOne({
-        $and: [{ comment: req.params.commentId }, { user: req.user._id }],
-      });
-      if (likeDeleteResult.deletedCount === 0) {
-        return res.status(404).json({ message: "Like not found" });
-      }
-      return res.status(200).json({ message: "Like deleted" });
+    const likeDeleteResult = await Like.deleteOne(
+      { _id: req.params.likeId },
+      { user: req.user._id }
+    );
+    if (likeDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Like not found" });
     }
+    return res.status(200).json({ message: "Like deleted" });
   } catch (err) {
     next(err);
   }
