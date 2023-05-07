@@ -19,7 +19,7 @@ exports.friendRequest_details = async (req, res, next) => {
 /* GET user's friend request listing. */
 exports.friendRequest_listing = async (req, res, next) => {
   try {
-    const friendRequests = FriendRequest.find({ receiver: req.user._id });
+    const friendRequests = await FriendRequest.find({ receiver: req.user._id });
     return res.status(200).json({ friendRequests });
   } catch (err) {
     return next(err);
