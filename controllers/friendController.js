@@ -37,7 +37,7 @@ exports.friend_suggestion = async (req, res, next) => {
       $nor: [
         { _id: userId },
         { _id: { $in: userWithCommonFriendsIds } },
-        { friends: { $in: [userId] } },
+        { friends: userId },
       ],
     })
       .populate("profile", "-gender -birthday -friends")
