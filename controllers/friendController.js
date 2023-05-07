@@ -34,7 +34,7 @@ exports.friend_suggestion = async (req, res, next) => {
     );
 
     const otherUser = await User.find({
-      $or: [
+      $nor: [
         { _id: { $ne: userId } },
         { _id: { $nin: userWithCommonFriendsIds } },
         { friends: { $ne: userId } },

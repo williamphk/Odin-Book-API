@@ -1,5 +1,6 @@
 const FriendRequest = require("../models/friendRequest");
 const { friendRequestValidationRules } = require("./validationRules");
+const { body, validationResult } = require("express-validator");
 
 /* GET user's friend request details. */
 exports.friendRequest_details = async (req, res, next) => {
