@@ -9,19 +9,26 @@ const {
 
 const friendrequest_controller = require("../controllers/friendRequestController");
 
+/* GET user's friend request listing. */
+router.get(
+  "/sent",
+  passport.authenticate("jwt", { session: false }),
+  friendrequest_controller.friendRequest_sent_listing
+);
+
+/* GET user's friend request listing. */
+router.get(
+  "/received",
+  passport.authenticate("jwt", { session: false }),
+  friendrequest_controller.friendRequest_received_listing
+);
+
 /* GET user's friend request details. */
 router.get(
   "/:friendRequestId",
   passport.authenticate("jwt", { session: false }),
   isUserFriendRequestReceiver,
   friendrequest_controller.friendRequest_details
-);
-
-/* GET user's friend request listing. */
-router.get(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  friendrequest_controller.friendRequest_listing
 );
 
 /* POST user friend request. */
