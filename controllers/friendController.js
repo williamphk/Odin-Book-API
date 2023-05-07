@@ -5,9 +5,9 @@ const { User } = require("../models/user");
 /* GET user's friending suggest based on common friends. */
 exports.friend_suggestion = async (req, res, next) => {
   try {
-    const userId = mongoose.Types.ObjectId(req.params.userId);
+    const userId = new mongoose.Types.ObjectId(req.params.userId);
 
-    const friendSuggestions = await User.aggregate([
+    const userWithCommonFriends = await User.aggregate([
       { $match: { _id: { $ne: userId }, friends: { $ne: userId } } },
       {
         $lookup: {
@@ -29,7 +29,23 @@ exports.friend_suggestion = async (req, res, next) => {
       { $project: { password: 0 } },
     ]);
 
-    return res.status(200).json({ friendSuggestions });
+    const userWithCommonFriendsIds = userWithCommonFriends.map(
+      (element) => element._id
+    );
+
+    const otherUser = await User.find({
+      $or: [
+        { _id: { $ne: userId } },
+        { _id: { $nin: userWithCommonFriendsIds } },
+        { friends: { $ne: userId } },
+      ],
+    })
+      .populate("profile", "-gender -birthday -friends")
+      .select("-password -email");
+
+    const friendSuggestion = [...userWithCommonFriends, ...otherUser];
+
+    return res.status(200).json({ friendSuggestion });
   } catch (err) {
     next(err);
   }

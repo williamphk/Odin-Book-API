@@ -200,8 +200,8 @@ exports.user_delete = async (req, res, next) => {
 
     //Delete User's comments's likes
     const userComments = await Comment.find({ user: req.params.userId });
-    const userCommentstIds = userComments.map((element) => element._id);
-    await Like.deleteMany({ comment: { $in: userCommentstIds } });
+    const userCommentsIds = userComments.map((element) => element._id);
+    await Like.deleteMany({ comment: { $in: userCommentsIds } });
 
     //Delete User's posts' comments
     await Comment.deleteMany({ post: { $in: userPostsIds } });
