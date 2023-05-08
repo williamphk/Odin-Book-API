@@ -89,16 +89,21 @@ exports.comment_update = [
 
 /* DELETE comment. */
 exports.comment_delete = async (req, res, next) => {
-  const commentId = req.params.commentId;
+  const { commentId } = req.params;
   try {
-    // Delete Comment
-    const commentDeleteResult = await Comment.deleteOne({ _id: commentId });
+    // Delete Comment and Comment's likes
+    const [commentDeleteResult, likesDeleteResult] = await Promise.all([
+      Comment.deleteOne({ _id: commentId }),
+      Like.deleteMany({ comment: commentId }),
+    ]);
+
     if (commentDeleteResult.deletedCount === 0) {
-      return res.status(404).json({ message: "Like not found" });
+      return res.status(404).json({ message: "Comment not deleted" });
     }
 
-    // Delete Comment's likes
-    await Like.deleteMany({ comment: commentId });
+    if (likesDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Likes not deleted" });
+    }
 
     return res
       .status(200)
