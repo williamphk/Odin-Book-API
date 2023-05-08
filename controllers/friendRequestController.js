@@ -108,27 +108,29 @@ exports.friendRequest_accept = async (req, res, next) => {
     const senderId = friendRequest.sender;
     const receiverId = friendRequest.receiver;
 
-    const friendRequestDeleteResult = await FriendRequest.deleteOne({
-      _id: req.params.friendRequestId,
-      receiver: req.user._id,
-    });
-    if (friendRequestDeleteResult.deletedCount == 0) {
-      return res.status(404).json({ message: "Friend request not deleted" });
-    }
-
-    // Update friends field for both sender and receiver
-    const [senderUpdateResult, receiverUpdateResult] = await Promise.all([
+    // Delete Friend Request, update friends field for both sender and receiver
+    const [
+      friendRequestDeleteResult,
+      senderUpdateResult,
+      receiverUpdateResult,
+    ] = await Promise.all([
+      FriendRequest.deleteOne({
+        _id: req.params.friendRequestId,
+        receiver: req.user._id,
+      }),
       Profile.updateOne({ user: senderId }, { $push: { friends: receiverId } }),
       Profile.updateOne({ user: receiverId }, { $push: { friends: senderId } }),
     ]);
+
+    if (friendRequestDeleteResult.deletedCount == 0) {
+      return res.status(404).json({ message: "Friend request not deleted" });
+    }
 
     if (
       senderUpdateResult.modifiedCount === 0 ||
       receiverUpdateResult.modifiedCount === 0
     ) {
-      return res
-        .status(404)
-        .json({ message: "Sender or Receiver not updated" });
+      return res.status(404).json({ message: "Friend List not updated" });
     }
     return res.status(200).json({ message: "Friend request accepted" });
   } catch (err) {
