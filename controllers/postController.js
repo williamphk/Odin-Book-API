@@ -100,7 +100,7 @@ exports.post_update = [
         { content: req.body.content }
       );
       if (postUpdateResult.modifiedCount == 0) {
-        return res.status(404).json({ message: "Post not found" });
+        return res.status(404).json({ message: "Post not updated" });
       }
       return res.status(200).json({ message: "Post Updated" });
     } catch (err) {
@@ -116,18 +116,24 @@ exports.post_delete = async (req, res, next) => {
     // Delete Post
     const postDeleteResult = await Post.deleteOne({ _id: postId });
     if (postDeleteResult.deletedCount === 0) {
-      return res.status(404).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Post not deleted" });
     }
 
     // Delete Post's comments
-    await Comment.deleteMany({ post: postId });
+    const commentsDeleteResult = await Comment.deleteMany({ post: postId });
+    if (commentsDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Comments not deleted" });
+    }
 
     // Delete Post's likes and Post's comments' likes
     const comments = await Comment.find({ post: postId });
     const commentIds = comments.map((element) => element._id);
-    await Like.deleteMany({
+    const likesDeleteResult = await Like.deleteMany({
       $or: [{ post: postId }, { comment: { $in: commentIds } }],
     });
+    if (likesDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Likes not deleted" });
+    }
 
     return res
       .status(200)
