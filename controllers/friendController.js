@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const { User } = require("../models/user");
+const { User, Profile } = require("../models/user");
 
 /* GET user's friending suggest based on common friends. */
 exports.friend_suggestion = async (req, res, next) => {
@@ -54,7 +54,7 @@ exports.friend_suggestion = async (req, res, next) => {
 /* GET user's friend listing. */
 exports.friend_listing = async (req, res, next) => {
   try {
-    const friends = await User.find({ friends: req.params.userId });
+    const friends = await Profile.find({ friends: req.params.userId });
     return res.status(200).json({ friends });
   } catch (err) {
     next(err);
@@ -64,13 +64,13 @@ exports.friend_listing = async (req, res, next) => {
 /* DELETE user friend remove. */
 exports.friend_remove = async (req, res, next) => {
   try {
-    [userUpdateResult, userFriendsUpdateResult] = Promise.all([
-      await User.updateOne(
-        { _id: req.params.userId },
+    [userUpdateResult, userFriendsUpdateResult] = await Promise.all([
+      Profile.updateOne(
+        { user: req.params.userId },
         { $pull: { friends: req.params.friendId } }
       ),
-      await User.updateOne(
-        { _id: req.params.friendId },
+      Profile.updateOne(
+        { user: req.params.friendId },
         { $pull: { friends: req.params.userId } }
       ),
     ]);
