@@ -64,16 +64,17 @@ exports.friendRequest_create = [
     }
 
     try {
-      const receiver = await User.findById(req.body.receiverId);
+      const [receiver, existingRequest] = await Promise.all([
+        User.findById(req.body.receiverId),
+        FriendRequest.findOne({
+          sender: req.user._id,
+          receiver: req.body.receiverId,
+        }),
+      ]);
 
       if (receiver == null) {
         return res.status(404).json({ message: "Receiver not found" });
       }
-
-      const existingRequest = await FriendRequest.findOne({
-        sender: req.user._id,
-        receiver: req.body.receiverId,
-      });
 
       if (existingRequest) {
         return res
