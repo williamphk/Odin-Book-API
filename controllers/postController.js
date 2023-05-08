@@ -111,33 +111,37 @@ exports.post_update = [
 
 /* DELETE post. */
 exports.post_delete = async (req, res, next) => {
-  const postId = req.params.postId;
+  const { postId } = req.params;
   try {
-    // Delete Post
-    const postDeleteResult = await Post.deleteOne({ _id: postId });
+    // Find comments related to the post
+    const comments = await Comment.find({ post: postId });
+    const commentIds = comments.map((element) => element._id);
+
+    // Delete Post, Post's comments, and Post's likes and Post's comments' likes
+    const [postDeleteResult, commentsDeleteResult, likesDeleteResult] =
+      await Promise.all([
+        Post.deleteOne({ _id: postId }),
+        Comment.deleteMany({ post: postId }),
+        Like.deleteMany({
+          $or: [{ post: postId }, { comment: { $in: commentIds } }],
+        }),
+      ]);
+
     if (postDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Post not deleted" });
     }
 
-    // Delete Post's comments
-    const commentsDeleteResult = await Comment.deleteMany({ post: postId });
     if (commentsDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Comments not deleted" });
     }
 
-    // Delete Post's likes and Post's comments' likes
-    const comments = await Comment.find({ post: postId });
-    const commentIds = comments.map((element) => element._id);
-    const likesDeleteResult = await Like.deleteMany({
-      $or: [{ post: postId }, { comment: { $in: commentIds } }],
-    });
     if (likesDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Likes not deleted" });
     }
 
     return res
       .status(200)
-      .json({ message: "Post, related comments and likes deleted" });
+      .json({ message: "Post, related comments, and likes deleted" });
   } catch (err) {
     next(err);
   }
