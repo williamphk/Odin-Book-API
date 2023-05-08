@@ -26,8 +26,10 @@ exports.friendRequest_received_listing = async (req, res, next) => {
       receiver: req.user._id,
     }).populate({
       path: "sender",
+      select: "-password -email",
       populate: {
         path: "profile",
+        select: "-gender -birthday -friends",
       },
     });
     return res.status(200).json({ friendRequests });
