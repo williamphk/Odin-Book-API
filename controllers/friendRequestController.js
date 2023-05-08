@@ -108,14 +108,25 @@ exports.friendRequest_accept = async (req, res, next) => {
     const senderId = friendRequest.sender;
     const receiverId = friendRequest.receiver;
 
-    await FriendRequest.updateOne(
+    const friendRequestUpdateResult = await FriendRequest.updateOne(
       { _id: req.params.friendRequestId, receiver: req.user._id },
       { $set: { status: "accepted" } }
     );
+    if (friendRequestUpdateResult.modifiedCount == 0) {
+      return res.status(404).json({ message: "Friend request not found" });
+    }
 
     // Update friends field for both sender and receiver
-    await User.updateOne({ _id: senderId }, { $push: { friends: receiverId } });
-    await User.updateOne({ _id: receiverId }, { $push: { friends: senderId } });
+    const [senderUpdateResult, receiverUpdateResult] = await Promise.all([
+      User.updateOne({ _id: senderId }, { $push: { friends: receiverId } }),
+      User.updateOne({ _id: receiverId }, { $push: { friends: senderId } }),
+    ]);
+    if (
+      senderUpdateResult.modifiedCount === 0 ||
+      receiverUpdateResult.modifiedCount === 0
+    ) {
+      return res.status(404).json({ message: "Sender or Receiver not found" });
+    }
     return res.status(200).json({ message: "Friend request accepted" });
   } catch (err) {
     return next(err);

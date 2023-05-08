@@ -39,16 +39,20 @@ router.post(
 );
 
 /* PUT user accpeting friend request */
-router.put("/:friendRequestId/accept"),
+router.put(
+  "/:friendRequestId/accept",
   passport.authenticate("jwt", { session: false }),
   isUserFriendRequestReceiver,
-  friendrequest_controller.friendRequest_accept;
+  friendrequest_controller.friendRequest_accept
+);
 
 /* PUT user rejecting friend request */
-router.put("/:friendRequestId/reject"),
+router.put(
+  "/:friendRequestId/reject",
   passport.authenticate("jwt", { session: false }),
   isUserFriendRequestReceiver,
-  friendrequest_controller.friendRequest_reject;
+  friendrequest_controller.friendRequest_reject
+);
 
 /* DELETE user friend request. */
 router.delete(
