@@ -95,10 +95,13 @@ exports.post_update = [
     }
 
     try {
-      await Post.updateOne(
+      const postUpdateResult = await Post.updateOne(
         { _id: req.params.postId },
         { content: req.body.content }
       );
+      if (postUpdateResult.modifiedCount == 0) {
+        return res.status(404).json({ message: "Post not found" });
+      }
       return res.status(200).json({ message: "Post Updated" });
     } catch (err) {
       return next(err);
