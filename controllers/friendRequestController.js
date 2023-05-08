@@ -24,7 +24,12 @@ exports.friendRequest_received_listing = async (req, res, next) => {
   try {
     const friendRequests = await FriendRequest.find({
       receiver: req.user._id,
-    }).populate({ path: "user", populate: { path: "profile" } });
+    }).populate({
+      path: "sender",
+      populate: {
+        path: "profile",
+      },
+    });
     return res.status(200).json({ friendRequests });
   } catch (err) {
     return next(err);
