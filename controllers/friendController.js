@@ -64,14 +64,25 @@ exports.friend_listing = async (req, res, next) => {
 /* DELETE user friend remove. */
 exports.friend_remove = async (req, res, next) => {
   try {
-    await User.updateOne(
-      { _id: req.params.userId },
-      { $pull: { friends: req.params.friendId } }
-    );
-    await User.updateOne(
-      { _id: req.params.userId },
-      { $pull: { friends: req.params.userId } }
-    );
+    [userUpdateResult, userFriendsUpdateResult] = Promise.all([
+      await User.updateOne(
+        { _id: req.params.userId },
+        { $pull: { friends: req.params.friendId } }
+      ),
+      await User.updateOne(
+        { _id: req.params.friendId },
+        { $pull: { friends: req.params.userId } }
+      ),
+    ]);
+
+    if (userUpdateResult.modifiedCount === 0) {
+      return res.status(404).json({ message: "User not updated" });
+    }
+
+    if (userFriendsUpdateResult.modifiedCount === 0) {
+      return res.status(404).json({ message: "User's friends not updated" });
+    }
+
     return res.status(200).json({ message: "friend removed" });
   } catch (err) {
     return next(err);

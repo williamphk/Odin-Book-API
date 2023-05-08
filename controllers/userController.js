@@ -166,29 +166,35 @@ exports.user_delete = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    // Delete User
-    const userDeleteResult = await User.deleteOne({ _id: userId });
-    if (userDeleteResult.deletedCount === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    const [userPosts, userComments, userPostsComments] = await Promise.all([
+      Post.find({ user: userId }),
+      Comment.find({ user: userId }),
+      Comment.find({ post: { $in: userPostsIds } }),
+    ]);
 
-    const userPosts = await Post.find({ user: userId });
     const userPostsIds = userPosts.map((element) => element._id);
-
-    const userComments = await Comment.find({ user: userId });
     const userCommentsIds = userComments.map((element) => element._id);
-
-    const userPostsComments = await Comment.find({
-      post: { $in: userPostsIds },
-    });
     const userPostsCommentsIds = userPostsComments.map(
       (element) => element._id
     );
 
-    await Promise.all([
+    const [userDeleteResult, userProfileDeleteResult] = await Promise.all([
+      // Delete User
+      User.deleteOne({ _id: userId }),
+
       // Delete User's profile
       Profile.deleteOne({ user: userId }),
+    ]);
 
+    if (userDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "User not deleted" });
+    }
+
+    if (userProfileDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: "Profile not deleted" });
+    }
+
+    await Promise.all([
       // Delete User's friend requests if any
       FriendRequest.deleteMany({
         $or: [{ sender: userId }, { receiver: userId }],
