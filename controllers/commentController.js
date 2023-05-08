@@ -73,10 +73,13 @@ exports.comment_update = [
     }
 
     try {
-      await Comment.updateOne(
+      const postUpdateResult = await Comment.updateOne(
         { _id: req.params.commentId },
         { content: req.body.content }
       );
+      if (postUpdateResult.modifiedCount == 0) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
       return res.status(200).json({ message: "Comment Updated" });
     } catch (err) {
       return next(err);
