@@ -78,9 +78,11 @@ exports.user_create = [
   async (req, res, next) => {
     const errors = validationResult(req);
 
+    const { email, password } = req.body;
+
     const user = new User({
-      email: req.body.email,
-      password: req.body.password,
+      email: email,
+      password: password,
     });
 
     const profile = new Profile({
@@ -118,10 +120,10 @@ exports.user_create = [
         const userResponse = {
           _id: user._id,
           email: user.email,
-          firstName: user.profile.firstName,
-          lastName: user.profile.lastName,
-          fullName: user.profile.fullName,
-          picture: user.profile.picture,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          fullName: profile.fullName,
+          picture: profile.picture,
         };
         return res.status(200).json({
           message: "User created & login successful",
