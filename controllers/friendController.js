@@ -33,12 +33,18 @@ exports.friend_suggestion = async (req, res, next) => {
       (element) => element._id
     );
 
-    const otherUser = await User.find({
+    const otherUserProfile = await Profile.find({
       $nor: [
-        { _id: userId },
-        { _id: { $in: userWithCommonFriendsIds } },
+        { user: userId },
+        { user: { $in: userWithCommonFriendsIds } },
         { friends: userId },
       ],
+    });
+
+    const otherUserProfileIds = otherUserProfile.map((element) => element._id);
+
+    const otherUser = await User.find({
+      profile: { $in: otherUserProfileIds },
     })
       .populate("profile", "-gender -birthday -friends")
       .select("-password -email");
