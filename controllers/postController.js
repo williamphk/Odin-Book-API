@@ -131,14 +131,6 @@ exports.post_delete = async (req, res, next) => {
       return res.status(404).json({ message: "Post not deleted" });
     }
 
-    if (commentsDeleteResult.deletedCount === 0) {
-      return res.status(404).json({ message: "Comments not deleted" });
-    }
-
-    if (likesDeleteResult.deletedCount === 0) {
-      return res.status(404).json({ message: "Likes not deleted" });
-    }
-
     return res
       .status(200)
       .json({ message: "Post, related comments, and likes deleted" });
