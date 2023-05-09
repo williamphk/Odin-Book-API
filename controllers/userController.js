@@ -169,14 +169,18 @@ exports.user_delete = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    const [userPosts, userComments, userPostsComments] = await Promise.all([
+    const [userPosts, userComments] = await Promise.all([
       Post.find({ user: userId }),
       Comment.find({ user: userId }),
-      Comment.find({ post: { $in: userPostsIds } }),
     ]);
 
     const userPostsIds = userPosts.map((element) => element._id);
     const userCommentsIds = userComments.map((element) => element._id);
+
+    const userPostsComments = await Comment.find({
+      post: { $in: userPostsIds },
+    });
+
     const userPostsCommentsIds = userPostsComments.map(
       (element) => element._id
     );

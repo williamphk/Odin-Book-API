@@ -35,8 +35,10 @@ exports.post_newsfeed_listing = async (req, res, next) => {
     const posts = await Post.find({ user: { $in: friendIds } })
       .populate({
         path: "user",
+        select: "-password -email",
         populate: {
           path: "profile",
+          select: "-gender -birthday -friends",
         },
       })
       .sort({ createdAt: -1 }); // Sort by recency (descending order)
