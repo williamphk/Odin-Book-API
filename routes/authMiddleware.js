@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const { User } = require("../models/user");
+const { User, Profile } = require("../models/user");
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const Like = require("../models/like");
@@ -113,10 +113,13 @@ module.exports.isPostUserAndUserFriends = async (req, res, next) => {
     return res.status(404).json({ message: "Post user not found" });
   }
 
-  const postUserFriends = await User.find({ friends: postUser._id });
+  const postUserFriends = await Profile.find({
+    friends: postUser._id,
+  }).populate("user");
   const postUserFriendsIds = postUserFriends.map((element) =>
-    element._id.toString()
+    element.user._id.toString()
   );
+  console.log(postUserFriendsIds);
   // Check if the user is the post user or post user's friend
   if (
     req.user._id.toString() !== postUser._id.toString() &&
