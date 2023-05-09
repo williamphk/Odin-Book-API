@@ -1,7 +1,4 @@
 var express = require("express");
-const jwt = require("jsonwebtoken");
-const { User } = require("../models/user");
-var bcrypt = require("bcryptjs");
 const passport = require("passport");
 require("dotenv").config();
 

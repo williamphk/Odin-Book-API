@@ -119,7 +119,6 @@ module.exports.isPostUserAndUserFriends = async (req, res, next) => {
   const postUserFriendsIds = postUserFriends.map((element) =>
     element.user._id.toString()
   );
-  console.log(postUserFriendsIds);
   // Check if the user is the post user or post user's friend
   if (
     req.user._id.toString() !== postUser._id.toString() &&

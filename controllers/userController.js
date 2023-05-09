@@ -113,14 +113,15 @@ exports.user_create = [
         );
 
         // Log the user in
-        const secret = `${process.env.SECRET}`;
-        const token = jwt.sign({ id: user._id }, secret, { expiresIn: "14d" });
+        const secret = `${process.env.JWT_SECRET}`;
+        const token = jwt.sign({ email }, secret, { expiresIn: "14d" });
         const userResponse = {
           _id: user._id,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          fullName: user.fullName,
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
+          fullName: user.profile.fullName,
+          picture: user.profile.picture,
         };
         return res.status(200).json({
           message: "User created & login successful",
