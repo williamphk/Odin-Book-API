@@ -27,7 +27,6 @@ router.get(
 router.get(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
-  isUser,
   user_controller.user_details
 );
 
