@@ -45,10 +45,9 @@ const userProfileUpdateValidationRules = [
 /* GET users details. */
 exports.user_details = async (req, res, next) => {
   try {
-    const user = await User.findById(
-      req.params.userId,
-      "email firstName lastName gender birthday friends avatar bio"
-    ).populate("profile");
+    const user = await User.findById(req.params.userId)
+      .populate("profile", "-gender -birthday -friends")
+      .select("-password -email");
     if (user == null) {
       return res.status(404).json({ message: "User not found" });
     }
