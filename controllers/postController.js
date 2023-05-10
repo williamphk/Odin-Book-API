@@ -9,9 +9,10 @@ const { contentValidationRules } = require("./validationRules");
 
 /* GET user posts listing. */
 exports.post_listing = async (req, res, next) => {
+  const userId = req.params.userId ?? req.user._id;
   try {
     // Fetch posts from the user
-    const posts = await Post.find({ user: req.user._id })
+    const posts = await Post.find({ user: userId })
       .populate({
         path: "user",
         select: "-password -email",

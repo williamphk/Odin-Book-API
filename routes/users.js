@@ -6,6 +6,7 @@ const { isAdmin, isUser } = require("./authMiddleware");
 
 const user_controller = require("../controllers/userController");
 const friend_controller = require("../controllers/friendController");
+const post_controller = require("../controllers/postController");
 
 /* GET user's friending suggest. */
 router.get(
@@ -21,6 +22,13 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   isUser,
   friend_controller.friend_listing
+);
+
+/* GET posts listing. */
+router.get(
+  "/:userId/posts",
+  passport.authenticate("jwt", { session: false }),
+  post_controller.post_listing
 );
 
 /* GET users details. */
