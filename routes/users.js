@@ -20,7 +20,6 @@ router.get(
 router.get(
   "/:userId/friends",
   passport.authenticate("jwt", { session: false }),
-  isUser,
   friend_controller.friend_listing
 );
 

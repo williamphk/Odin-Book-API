@@ -60,7 +60,9 @@ exports.friend_suggestion = async (req, res, next) => {
 /* GET user's friend listing. */
 exports.friend_listing = async (req, res, next) => {
   try {
-    const friends = await Profile.find({ friends: req.params.userId });
+    const friends = await Profile.find({ friends: req.params.userId })
+      .populate("user", "-password -email")
+      .select("-gender -birthday -friends");
     return res.status(200).json({ friends });
   } catch (err) {
     next(err);
