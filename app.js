@@ -35,5 +35,6 @@ app.use("/login", loginRouter);
 app.use("/users", usersRouter);
 app.use("/friend-requests", friendRequestRouter);
 app.use("/posts", postRouter);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 module.exports = app;

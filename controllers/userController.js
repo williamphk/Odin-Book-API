@@ -1,6 +1,9 @@
 const { validationResult } = require("express-validator");
 var bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const { User, Profile } = require("../models/user");
 const FriendRequest = require("../models/friendRequest");
@@ -41,6 +44,51 @@ const userProfileUpdateValidationRules = [
   ...confirmPasswordValidationRules("confirmNewPassword"),
   ...genderValidationRules("gender"),
 ];
+
+const uploadDir = path.join(process.cwd(), "uploads");
+
+// Create the directory if it doesn't exist
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
+    );
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5, // limit file size to 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    // accept only jpg, jpeg, png files
+    const fileTypes = /jpeg|jpg|png/;
+    const mimetype = fileTypes.test(file.mimetype);
+    const extname = fileTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+
+    cb(
+      new Error(
+        "Error: File upload only supports the following filetypes - " +
+          fileTypes
+      )
+    );
+  },
+});
 
 /* GET users details. */
 exports.user_details = async (req, res, next) => {
@@ -133,6 +181,30 @@ exports.user_create = [
         return next(err);
       }
     });
+  },
+];
+
+/* PUT user profile picture with id. */
+exports.user_profilePicture_update = [
+  upload.single("profile_picture"),
+  async (req, res, next) => {
+    try {
+      if (!req.file) {
+        throw new Error("No file uploaded");
+      }
+      const updatedProfile = await Profile.updateOne(
+        { user: req.params.userId },
+        { $set: { picture: req.file.filename } }
+      );
+      if (updatedProfile.modifiedCount === 0) {
+        throw new Error("Profile picture update failed");
+      }
+      return res
+        .status(200)
+        .json({ message: "Profile picture updated successfully" });
+    } catch (err) {
+      return next(err);
+    }
   },
 ];
 

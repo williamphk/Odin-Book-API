@@ -48,6 +48,14 @@ router.get(
 /* POST users. */
 router.post("/", user_controller.user_create);
 
+/* PUT user's profile picture. */
+router.put(
+  "/:userId/picture",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_profilePicture_update
+);
+
 /* PUT user's profile. */
 router.put(
   "/:userId",
