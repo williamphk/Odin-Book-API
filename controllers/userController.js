@@ -192,6 +192,19 @@ exports.user_profilePicture_update = [
       if (!req.file) {
         throw new Error("No file uploaded");
       }
+
+      const profile = await Profile.findOne({ user: req.params.userId });
+      if (profile && profile.picture) {
+        fs.unlink(
+          path.join(__dirname, "..", "uploads", profile.picture),
+          (err) => {
+            if (err) {
+              console.error("Failed to delete old profile picture:", err);
+            }
+          }
+        );
+      }
+
       const updatedProfile = await Profile.updateOne(
         { user: req.params.userId },
         { $set: { picture: req.file.filename } }
@@ -199,9 +212,11 @@ exports.user_profilePicture_update = [
       if (updatedProfile.modifiedCount === 0) {
         throw new Error("Profile picture update failed");
       }
-      return res
-        .status(200)
-        .json({ message: "Profile picture updated successfully" });
+
+      return res.status(200).json({
+        message: "Profile picture updated successfully",
+        picture: req.file.filename,
+      });
     } catch (err) {
       return next(err);
     }
