@@ -24,7 +24,6 @@ router.get(
 router.get(
   "/:postId/comments/:commentId/likes",
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   like_conroller.comment_like_listing
 );
 
@@ -40,7 +39,6 @@ router.get(
 router.get(
   "/:postId/comments",
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   comment_controller.comment_listing
 );
 
@@ -48,7 +46,6 @@ router.get(
 router.get(
   "/:postId/likes",
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   like_conroller.post_like_listing
 );
 
@@ -71,7 +68,6 @@ router.get(
 router.post(
   "/:postId/comments/:commentId/likes",
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   like_conroller.like_create
 );
 
@@ -79,7 +75,6 @@ router.post(
 router.post(
   "/:postId/comments",
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   comment_controller.comment_create
 );
 
@@ -100,7 +95,6 @@ router.post(
   //   })(req, res, next);
   // },
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   like_conroller.like_create
 );
 
