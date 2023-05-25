@@ -31,7 +31,6 @@ router.get(
 router.get(
   "/:postId/comments/:commentId",
   passport.authenticate("jwt", { session: false }),
-  isPostUserAndUserFriends,
   comment_controller.comment_details
 );
 
