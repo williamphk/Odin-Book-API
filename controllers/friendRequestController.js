@@ -139,18 +139,18 @@ exports.friendRequest_accept = async (req, res, next) => {
   }
 };
 
-/* PUT user rejecting friend request */
+/* DELETE user rejecting friend request */
 exports.friendRequest_reject = async (req, res, next) => {
   try {
-    const friendRequestUpdateResult = await FriendRequest.updateOne(
-      { _id: req.params.friendRequestId, receiver: req.user._id },
-      { $set: { status: "rejected" } }
-    );
-    if (friendRequestUpdateResult.modifiedCount == 0) {
-      return res.status(404).json({ message: "Friend request not found" });
+    const friendRequestDeleteResult = await FriendRequest.deleteOne({
+      _id: req.params.friendRequestId,
+      receiver: req.user._id,
+    });
+    if (friendRequestDeleteResult.deletedCount == 0) {
+      return res.status(404).json({ message: "Friend request not deleted" });
     }
 
-    return res.status(200).json({ message: "Friend request rejected" });
+    return res.status(200).json({ message: "Friend request deleted" });
   } catch (err) {
     return next(err);
   }

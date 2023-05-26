@@ -46,8 +46,8 @@ router.put(
   friendrequest_controller.friendRequest_accept
 );
 
-/* PUT user rejecting friend request */
-router.put(
+/* DELETE user rejecting friend request */
+router.delete(
   "/:friendRequestId/reject",
   passport.authenticate("jwt", { session: false }),
   isUserFriendRequestReceiver,
