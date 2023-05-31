@@ -194,7 +194,7 @@ exports.user_profilePicture_update = [
       }
 
       const profile = await Profile.findOne({ user: req.params.userId });
-      if (profile && profile.picture) {
+      if (profile.picture !== "default") {
         fs.unlink(
           path.join(__dirname, "..", "uploads", profile.picture),
           (err) => {
@@ -254,6 +254,7 @@ exports.user_profile_update = [
 exports.user_delete = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    const profile = await Profile.findOne({ user: userId });
 
     const [userPosts, userComments] = await Promise.all([
       Post.find({ user: userId }),
@@ -285,6 +286,17 @@ exports.user_delete = async (req, res, next) => {
 
     if (userProfileDeleteResult.deletedCount === 0) {
       return res.status(404).json({ message: "Profile not deleted" });
+    }
+
+    if (profile.picture !== "default") {
+      fs.unlink(
+        path.join(__dirname, "..", "uploads", profile.picture),
+        (err) => {
+          if (err) {
+            console.error("Failed to delete old profile picture:", err);
+          }
+        }
+      );
     }
 
     await Promise.all([

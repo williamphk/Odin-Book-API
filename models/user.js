@@ -26,6 +26,9 @@ const ProfileSchema = new Schema(
       type: String,
       default: "default",
     },
+    work: { type: String },
+    education: { type: String },
+    city: { type: String },
   },
   {
     // Include these options to include virtual properties in the output
