@@ -138,3 +138,11 @@ exports.contentValidationRules = (key) => [
     .withMessage("Content must be less than 200 characters")
     .escape(),
 ];
+
+exports.introValidationRules = (key) => [
+  body(key)
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage("Content must be less than 50 characters")
+    .escape(),
+];

@@ -56,6 +56,30 @@ router.put(
   user_controller.user_profilePicture_update
 );
 
+/* PUT user's profile work */
+router.put(
+  "/:userId/work",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_profile_work_update
+);
+
+/* PUT user's profile education */
+router.put(
+  "/:userId/education",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_profile_education_update
+);
+
+/* PUT user's profile city */
+router.put(
+  "/:userId/city",
+  passport.authenticate("jwt", { session: false }),
+  isUser,
+  user_controller.user_profile_city_update
+);
+
 /* PUT user's profile. */
 router.put(
   "/:userId",

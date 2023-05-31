@@ -19,6 +19,7 @@ const {
   genderValidationRules,
   birthdayValidationRules,
   oldPasswordValidationRules,
+  introValidationRules,
 } = require("./validationRules");
 
 // Convert names as "title case"
@@ -217,6 +218,69 @@ exports.user_profilePicture_update = [
         message: "Profile picture updated successfully",
         picture: req.file.filename,
       });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
+
+/* PUT user profile work with id */
+exports.user_profile_work_update = [
+  ...introValidationRules("work"),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      await Profile.updateOne(
+        { user: req.params.userId },
+        { $set: { work: req.body.work } }
+      );
+      return res.status(200).json({ message: "Work Updated" });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
+
+/* PUT user profile education with id */
+exports.user_profile_education_update = [
+  ...introValidationRules("education"),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      await Profile.updateOne(
+        { user: req.params.userId },
+        { $set: { work: req.body.education } }
+      );
+      return res.status(200).json({ message: "Education Updated" });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
+
+/* PUT user profile education with id */
+exports.user_profile_city_update = [
+  ...introValidationRules("city"),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      await Profile.updateOne(
+        { user: req.params.userId },
+        { $set: { work: req.body.city } }
+      );
+      return res.status(200).json({ message: "City Updated" });
     } catch (err) {
       return next(err);
     }
