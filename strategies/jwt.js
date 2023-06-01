@@ -12,8 +12,10 @@ module.exports = new JwtStrategy(opts, async (jwt_payload, done) => {
   try {
     // Find the user with the email from the JWT payload
     const user = await User.findOne({
-      email: jwt_payload.email,
+      $or: [{ email: jwt_payload.email }, { _id: jwt_payload.id }],
     });
+    console.log(jwt_payload);
+
     // If a user with the provided email is found, consider the request authenticated
     if (user) {
       return done(null, user);

@@ -10,12 +10,9 @@ exports.facebook_login = async (req, res) => {
     expiresIn: "14d",
   });
 
-  // Populate the Profile
-  const user = await User.findById(req.user._id).populate("profile");
-
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: "Strict", // can be 'Lax' or 'None' if required
+    sameSite: "Strict",
     secure: false,
     maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
   });
@@ -60,6 +57,39 @@ exports.jwt_login = async (req, res, next) => {
       } else {
         // If the passwords do not match, return with a message
         return res.status(401).json({ password: "Incorrect password" });
+      }
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/* GET JWT check */
+exports.token_check = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "token is not found" });
+    }
+
+    jwt.verify(token, `${process.env.JWT_SECRET}`, async (err, decoded) => {
+      if (err) {
+        // token is invalid
+        return res.status(401).json({ message: "token is not valid" });
+      } else {
+        // token is valid, now get the user using the id from the decoded token
+        const user = await User.findById(decoded.id).populate("profile");
+        const userResponse = {
+          _id: user._id,
+          email: user.email,
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
+          fullName: user.profile.fullName,
+          picture: user.profile.picture,
+        };
+        return res
+          .status(200)
+          .json({ isAuthenticated: true, token, userResponse });
       }
     });
   } catch (err) {

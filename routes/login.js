@@ -15,22 +15,7 @@ router.get(
   login_controller.facebook_login
 );
 
-router.get("/check", (req, res) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({ message: "token is not found" });
-  }
-
-  jwt.verify(token, `${process.env.JWT_SECRET}`, (err, decoded) => {
-    if (err) {
-      // token is invalid
-      return res.status(401).json({ message: "token is not valid" });
-    } else {
-      // token is valid
-      return res.status(200).json({ isAuthenticated: true });
-    }
-  });
-});
+router.get("/check", login_controller.token_check);
 
 router.get(
   "/facebook",

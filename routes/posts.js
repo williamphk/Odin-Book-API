@@ -16,6 +16,19 @@ const like_conroller = require("../controllers/likeController");
 /* GET posts newsfeed listing. */
 router.get(
   "/newsfeed",
+  // (req, res, next) => {
+  //   passport.authenticate("jwt", { session: false }, (err, user, info) => {
+  //     if (err) {
+  //       return next(err);
+  //     }
+  //     if (!user) {
+  //       console.log("Info:", info); // Add this line to log the info object
+  //       return res.status(401).json({ message: "Unauthorized" });
+  //     }
+  //     req.user = user;
+  //     next();
+  //   })(req, res, next);
+  // },
   passport.authenticate("jwt", { session: false }),
   post_controller.post_newsfeed_listing
 );
@@ -80,19 +93,6 @@ router.post(
 /* POST post likes. */
 router.post(
   "/:postId/likes",
-  // (req, res, next) => {
-  //   passport.authenticate("jwt", { session: false }, (err, user, info) => {
-  //     if (err) {
-  //       return next(err);
-  //     }
-  //     if (!user) {
-  //       console.log("Info:", info); // Add this line to log the info object
-  //       return res.status(401).json({ message: "Unauthorized" });
-  //     }
-  //     req.user = user;
-  //     next();
-  //   })(req, res, next);
-  // },
   passport.authenticate("jwt", { session: false }),
   like_conroller.like_create
 );
