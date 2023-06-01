@@ -1,6 +1,7 @@
 var express = require("express");
 const passport = require("passport");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 var router = express.Router();
 
@@ -17,16 +18,16 @@ router.get(
 router.get("/check", (req, res) => {
   const token = req.cookies.token;
   if (!token) {
-    return res.json({ isAuthenticated: false });
+    return res.status(401).json({ message: "token is not found" });
   }
 
-  jwt.verify(token, YOUR_SECRET_KEY, (err, decoded) => {
+  jwt.verify(token, `${process.env.JWT_SECRET}`, (err, decoded) => {
     if (err) {
       // token is invalid
-      return res.json({ isAuthenticated: false });
+      return res.status(401).json({ message: "token is not valid" });
     } else {
       // token is valid
-      return res.json({ isAuthenticated: true });
+      return res.status(200).json({ isAuthenticated: true });
     }
   });
 });

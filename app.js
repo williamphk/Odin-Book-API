@@ -46,8 +46,12 @@ passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
 
-// Enable CORS
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:3001",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use("/", indexRouter);
 app.use("/login", loginRouter);

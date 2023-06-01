@@ -6,7 +6,7 @@ require("dotenv").config();
 
 exports.facebook_login = async (req, res) => {
   // Generate a JWT for the authenticated user
-  const token = jwt.sign({ id: req.user.id }, `${process.env.SECRET}`, {
+  const token = jwt.sign({ id: req.user.id }, `${process.env.JWT_SECRET}`, {
     expiresIn: "14d",
   });
 
@@ -16,7 +16,7 @@ exports.facebook_login = async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true,
     sameSite: "Strict", // can be 'Lax' or 'None' if required
-    secure: process.env.NODE_ENV !== "development", // set to true if in production (HTTPS), false otherwise
+    secure: false,
     maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
   });
 
