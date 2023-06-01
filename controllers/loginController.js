@@ -4,13 +4,23 @@ var bcrypt = require("bcryptjs");
 
 require("dotenv").config();
 
-exports.facebook_login = function (req, res) {
+exports.facebook_login = async (req, res) => {
   // Generate a JWT for the authenticated user
   const token = jwt.sign({ id: req.user.id }, `${process.env.SECRET}`, {
     expiresIn: "14d",
   });
 
-  res.json({ token });
+  // Populate the Profile
+  const user = await User.findById(req.user._id).populate("profile");
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "Strict", // can be 'Lax' or 'None' if required
+    secure: process.env.NODE_ENV !== "development", // set to true if in production (HTTPS), false otherwise
+    maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
+  });
+
+  return res.redirect("http://localhost:3001/");
 };
 
 /* POST JWT login */

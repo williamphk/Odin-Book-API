@@ -3,6 +3,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
+const session = require("express-session");
 
 var indexRouter = require("./routes/index");
 var loginRouter = require("./routes/login");
@@ -20,12 +21,30 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Express-session configuration
+app.use(
+  session({
+    secret: "HELLO", // Replace 'your_secret_key' with your own secret key
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 // Passport configuration
 const passport = require("passport");
 const jwtStrategry = require("./strategies/jwt");
 const facebookStrategry = require("./strategies/facebook");
 passport.use(jwtStrategry);
 passport.use(facebookStrategry);
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser(function (user, cb) {
+  cb(null, user);
+});
+
+passport.deserializeUser(function (obj, cb) {
+  cb(null, obj);
+});
 
 // Enable CORS
 app.use(cors());

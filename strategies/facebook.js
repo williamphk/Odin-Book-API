@@ -7,15 +7,7 @@ const facebookOptions = {
   clientID: `${process.env.FB_APP_ID}`,
   clientSecret: `${process.env.FB_APP_SECRET}`,
   callbackURL: "http://localhost:3000/login/facebook/callback",
-  profileFields: [
-    "id",
-    "email",
-    "first_name",
-    "last_name",
-    "picture",
-    "gender",
-    "birthday",
-  ],
+  profileFields: ["id", "email", "first_name", "last_name", "picture"],
 };
 
 // Configure Facebook strategy
@@ -26,29 +18,30 @@ module.exports = new FacebookStrategy(facebookOptions, async function (
   done
 ) {
   try {
+    //console.log(fbProfile._json.picture.data.url);
     // Find or create user based on Facebook profile
-    const existingUser = await User.findOne({ facebookId: fbProfile.id });
+    const existingUser = await User.findOne({ facebookId: fbProfile._json.id });
 
     if (existingUser) {
       return done(null, existingUser);
     }
 
     const user = new User({
-      facebookId: fbProfile.id,
-      email: fbProfile.emails[0].value,
-      createdAt: new Date(),
+      facebookId: fbProfile._json.id,
+      email: fbProfile._json.email,
     });
 
     const profile = new Profile({
-      firstName: fbProfile.first_name,
-      lastName: fbProfile.last_name,
-      gender: fbProfile.gender,
-      birthday: fbProfile.birthday,
-      picture: fbProfile.picture,
+      firstName: fbProfile._json.first_name,
+      lastName: fbProfile._json.last_name,
+      picture: fbProfile._json.picture.data.url,
     });
 
     await user.save();
     await profile.save();
+
+    console.log(user._id);
+    console.log(profile._id);
 
     // Update the user with the profile's _id
     await User.updateOne({ _id: user._id }, { $set: { profile: profile._id } });

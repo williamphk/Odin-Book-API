@@ -257,7 +257,7 @@ exports.user_profile_education_update = [
     try {
       await Profile.updateOne(
         { user: req.params.userId },
-        { $set: { work: req.body.education } }
+        { $set: { education: req.body.education } }
       );
       return res.status(200).json({ message: "Education Updated" });
     } catch (err) {
@@ -278,7 +278,7 @@ exports.user_profile_city_update = [
     try {
       await Profile.updateOne(
         { user: req.params.userId },
-        { $set: { work: req.body.city } }
+        { $set: { city: req.body.city } }
       );
       return res.status(200).json({ message: "City Updated" });
     } catch (err) {
