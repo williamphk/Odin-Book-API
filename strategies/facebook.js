@@ -6,7 +6,8 @@ const { User, Profile } = require("../models/user");
 const facebookOptions = {
   clientID: `${process.env.FB_APP_ID}`,
   clientSecret: `${process.env.FB_APP_SECRET}`,
-  callbackURL: "http://localhost:3000/login/facebook/callback",
+  callbackURL:
+    "https://odin-book-api.azurewebsites.net/login/facebook/callback",
   profileFields: ["id", "email", "first_name", "last_name", "picture"],
 };
 
