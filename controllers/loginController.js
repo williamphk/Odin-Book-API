@@ -12,12 +12,12 @@ exports.facebook_login = async (req, res) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: "Strict",
+    sameSite: "None",
     secure: true,
     maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
   });
 
-  return res.status(200).json({ token });
+  return res.redirect("https://williamphk.github.io/Odin-Book-frontend/");
 };
 
 /* POST JWT login */
