@@ -17,7 +17,7 @@ exports.facebook_login = async (req, res) => {
     maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
   });
 
-  return res.redirect("https://williamphk.github.io/Odin-Book-frontend/");
+  return res.status(200).json({ token });
 };
 
 /* POST JWT login */
