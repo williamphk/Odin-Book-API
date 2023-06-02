@@ -10,6 +10,7 @@ var loginRouter = require("./routes/login");
 var usersRouter = require("./routes/users");
 var friendRequestRouter = require("./routes/friendRequest");
 var postRouter = require("./routes/posts");
+var logoutRouter = require("./routes/logout");
 
 require("./mongoConfig");
 
@@ -55,6 +56,7 @@ app.use(cors(corsOptions));
 
 app.use("/", indexRouter);
 app.use("/login", loginRouter);
+app.use("/logout", logoutRouter);
 app.use("/users", usersRouter);
 app.use("/friend-requests", friendRequestRouter);
 app.use("/posts", postRouter);
