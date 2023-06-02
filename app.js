@@ -48,7 +48,7 @@ passport.deserializeUser(function (obj, cb) {
 });
 
 const corsOptions = {
-  origin: "https://williamphk.github.io/Odin-Book-frontend/",
+  origin: "https://williamphk.github.io/",
   credentials: true,
 };
 
