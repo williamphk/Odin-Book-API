@@ -11,8 +11,8 @@ router.get(
     res.cookie("token", "", {
       expires: new Date(0),
       httpOnly: true,
-      sameSite: "Strict",
-      secure: false,
+      sameSite: "None",
+      secure: true,
     });
 
     return res.status(200).json({ message: "Logout successful" });
