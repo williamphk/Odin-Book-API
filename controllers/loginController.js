@@ -12,7 +12,7 @@ exports.facebook_login = async (req, res) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: true,
     maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
   });
