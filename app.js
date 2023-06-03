@@ -4,6 +4,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 const session = require("express-session");
+const appInsights = require("applicationinsights");
 
 var indexRouter = require("./routes/index");
 var loginRouter = require("./routes/login");
@@ -15,6 +16,7 @@ var logoutRouter = require("./routes/logout");
 require("./mongoConfig");
 
 var app = express();
+appInsights.setup("d2f18759-a313-481f-a99d-c62c6f1363e7").start();
 
 app.use(logger("dev"));
 app.use(express.json());
