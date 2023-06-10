@@ -11,26 +11,26 @@ exports.facebook_login = async (req, res) => {
     expiresIn: "14d",
   });
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
-  });
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   sameSite: "none",
+  //   secure: true,
+  //   maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
+  // });
 
-  appInsights.defaultClient.trackTrace({
-    message: "User object: " + JSON.stringify(req.user),
-  });
-  appInsights.defaultClient.trackTrace({
-    message: "Generated JWT token: " + token,
-  });
+  // appInsights.defaultClient.trackTrace({
+  //   message: "User object: " + JSON.stringify(req.user),
+  // });
+  // appInsights.defaultClient.trackTrace({
+  //   message: "Generated JWT token: " + token,
+  // });
 
-  // Before the redirect
-  appInsights.defaultClient.trackTrace({
-    message: "Response object: " + JSON.stringify(res),
-  });
+  // // Before the redirect
+  // appInsights.defaultClient.trackTrace({
+  //   message: "Response object: " + JSON.stringify(res),
+  // });
 
-  return res.redirect("https://williamphk.github.io/Odin-Book-frontend/");
+  return res.redirect("https://williamphk.github.io/Odin-Book-frontend/?token=" + token);
 };
 
 /* POST JWT login */
