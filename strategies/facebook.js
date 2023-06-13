@@ -7,7 +7,7 @@ const facebookOptions = {
   clientID: `${process.env.FB_APP_ID}`,
   clientSecret: `${process.env.FB_APP_SECRET}`,
   callbackURL:
-    "https://odin-book-api.azurewebsites.net/login/facebook/callback",
+    "https://odin-book.azurewebsites.net/login/facebook/callback",
   profileFields: ["id", "email", "first_name", "last_name", "picture"],
 };
 
