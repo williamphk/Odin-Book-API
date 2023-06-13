@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
 var bcrypt = require("bcryptjs");
-const appInsights = require("applicationinsights");
-
 
 require("dotenv").config();
 
@@ -12,28 +10,12 @@ exports.facebook_login = async (req, res) => {
     expiresIn: "14d",
   });
 
-  try {
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
-    });
-  } catch (err) {
-    console.error(err);
-  }
-
-  // appInsights.defaultClient.trackTrace({
-  //   message: "User object: " + JSON.stringify(req.user),
-  // });
-  // appInsights.defaultClient.trackTrace({
-  //   message: "Generated JWT token: " + token,
-  // });
-
-  // // Before the redirect
-  // appInsights.defaultClient.trackTrace({
-  //   message: "Response object: " + JSON.stringify(res),
-  // });
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
+  });
 
   return res.redirect("https://williamphk.github.io/Odin-Book-frontend/");
 };
