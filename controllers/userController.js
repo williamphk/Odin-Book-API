@@ -320,7 +320,7 @@ exports.user_delete = async (req, res, next) => {
     const { userId } = req.params;
     const profile = await Profile.findOne({ user: userId });
 
-    if (userId === "64a30f5eff1468089c105f62") {
+    if (userId === "644c12fc98784536ae313e1f") {
       return res.status(400).json({ message: "Cannot delete this user" });
     }
 
